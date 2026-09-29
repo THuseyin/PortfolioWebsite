@@ -4,7 +4,12 @@
   "private": true,
   "description": "Personal archive and portfolio website",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "dev": "pnpm --parallel --filter web --filter api run dev",
+    "build": "pnpm --filter web build && pnpm --filter api build",
+    "lint": "pnpm --filter web lint && pnpm --filter api lint",
+    "test": "pnpm --filter api test"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
