@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { CategoriesModule } from './categories/categories.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
 @Module({
@@ -12,6 +13,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
       envFilePath: '../../.env',
     }),
     PrismaModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
