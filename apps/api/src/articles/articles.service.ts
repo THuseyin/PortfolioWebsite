@@ -37,6 +37,7 @@ export class ArticlesService {
           id: true,
           title: true,
           slug: true,
+          headerImageUrl: true,
           status: true,
           publishedAt: true,
           createdAt: true,
@@ -89,6 +90,7 @@ export class ArticlesService {
         title: true,
         slug: true,
         summary: true,
+        headerImageUrl: true,
         content: true,
         status: true,
         publishedAt: true,
@@ -138,6 +140,7 @@ export class ArticlesService {
         title: true,
         slug: true,
         summary: true,
+        headerImageUrl: true,
         content: true,
         status: true,
         publishedAt: true,
@@ -216,6 +219,10 @@ export class ArticlesService {
         data.summary = updateArticleDto.summary;
       }
 
+      if (updateArticleDto.headerImageUrl !== undefined) {
+        data.headerImageUrl = updateArticleDto.headerImageUrl;
+      }
+
       if (updateArticleDto.content !== undefined) {
         data.content =
           updateArticleDto.content === null
@@ -253,6 +260,7 @@ export class ArticlesService {
           title: true,
           slug: true,
           summary: true,
+          headerImageUrl: true,
           content: true,
           status: true,
           publishedAt: true,
@@ -301,6 +309,7 @@ export class ArticlesService {
             title: true,
             slug: true,
             summary: true,
+            headerImageUrl: true,
             content: true,
             categoryId: true,
             status: true,
@@ -323,6 +332,10 @@ export class ArticlesService {
 
         if (!existingArticle.summary?.trim()) {
           missingFields.push('summary');
+        }
+
+        if (!existingArticle.headerImageUrl?.trim()) {
+          missingFields.push('header image');
         }
 
         if (existingArticle.content === null) {
@@ -359,6 +372,7 @@ export class ArticlesService {
             title: true,
             slug: true,
             summary: true,
+            headerImageUrl: true,
             content: true,
             status: true,
             publishedAt: true,
@@ -435,6 +449,7 @@ export class ArticlesService {
         title: true,
         slug: true,
         summary: true,
+        headerImageUrl: true,
         content: true,
         status: true,
         publishedAt: true,
@@ -501,6 +516,7 @@ export class ArticlesService {
           title: true,
           slug: true,
           summary: true,
+          headerImageUrl: true,
           publishedAt: true,
           category: {
             select: { id: true, name: true, slug: true },
@@ -539,6 +555,7 @@ export class ArticlesService {
         title: true,
         slug: true,
         summary: true,
+        headerImageUrl: true,
         content: true,
         publishedAt: true,
         category: {

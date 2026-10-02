@@ -78,8 +78,11 @@ function ArticleArchiveCard({ article, index }: { article: ArticleSummary; index
     <Link className="archive-row" to={`/articles/${article.slug}`}>
       <div className="archive-row__image">
         <img
-          src={`/images/home-collage/collage-${String(((index - 1) % 12) + 1).padStart(2, '0')}.jpg`}
-          alt=""
+          src={
+            article.headerImageUrl ??
+            `/images/home-collage/collage-${String(((index - 1) % 12) + 1).padStart(2, '0')}.jpg`
+          }
+          alt={`Header visual for ${article.title}`}
         />
         <span>{String(index).padStart(2, '0')}</span>
       </div>

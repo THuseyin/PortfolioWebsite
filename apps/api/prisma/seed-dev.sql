@@ -18,7 +18,7 @@ ON CONFLICT ("slug") DO UPDATE
 SET "name" = EXCLUDED."name", "updatedAt" = CURRENT_TIMESTAMP;
 
 INSERT INTO "Article" (
-  "id", "title", "slug", "summary", "content", "status",
+  "id", "title", "slug", "summary", "headerImageUrl", "content", "status",
   "publishedAt", "updatedAt", "categoryId"
 )
 VALUES
@@ -27,6 +27,7 @@ VALUES
   'Notes from an unfinished experiment',
   'notes-from-an-unfinished-experiment',
   'A temporary article used to test the public portfolio experience with real API data.',
+  '/images/home-collage/collage-03.jpg',
   '{
     "type": "doc",
     "content": [
@@ -55,6 +56,7 @@ VALUES
   'Building the frontend as an editorial playground',
   'building-the-frontend-as-an-editorial-playground',
   'A look at the tools and decisions behind the portfolio interface, from React and Vite to Motion and Tiptap.',
+  '/images/home-collage/collage-06.jpg',
   '{
     "type": "doc",
     "content": [
@@ -101,6 +103,7 @@ VALUES
   'Inside the portfolio API',
   'inside-the-portfolio-api',
   'How NestJS, Prisma, and PostgreSQL shape a compact backend for articles, taxonomy, sessions, and media.',
+  '/images/home-collage/collage-09.jpg',
   '{
     "type": "doc",
     "content": [
@@ -146,6 +149,7 @@ ON CONFLICT ("slug") DO UPDATE
 SET
   "title" = EXCLUDED."title",
   "summary" = EXCLUDED."summary",
+  "headerImageUrl" = EXCLUDED."headerImageUrl",
   "content" = EXCLUDED."content",
   "status" = EXCLUDED."status",
   "publishedAt" = EXCLUDED."publishedAt",

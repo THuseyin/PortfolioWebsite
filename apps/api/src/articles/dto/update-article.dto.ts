@@ -8,6 +8,7 @@ import {
   IsString,
   IsUUID,
   MaxLength,
+  Matches,
   ValidateIf,
 } from 'class-validator';
 
@@ -24,6 +25,15 @@ export class UpdateArticleDto {
   @IsString()
   @MaxLength(500)
   summary?: string | null;
+
+  @ValidateIf((_object, value) => value !== undefined && value !== null)
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @IsString()
+  @MaxLength(2048)
+  @Matches(/^(?:https?:\/\/|\/)/, {
+    message: 'headerImageUrl must be an absolute URL or a root-relative path',
+  })
+  headerImageUrl?: string | null;
 
   @ValidateIf((_object, value) => value !== undefined && value !== null)
   @IsObject()

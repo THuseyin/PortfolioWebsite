@@ -279,8 +279,11 @@ function ArticleCard({ article, index }: { article: ArticleSummary; index: numbe
   const body = (
     <>
       <img
-        src={`/images/home-collage/collage-${String(index + 2).padStart(2, '0')}.jpg`}
-        alt=""
+        src={
+          article.headerImageUrl ??
+          `/images/home-collage/collage-${String(index + 2).padStart(2, '0')}.jpg`
+        }
+        alt={`Header visual for ${article.title}`}
       />
       <div className="article-card__shade" />
       <div className="article-card__meta">

@@ -11,6 +11,7 @@ export type ArticleSummary = {
   title: string
   slug: string
   summary: string | null
+  headerImageUrl: string | null
   publishedAt: string
   category: Category | null
   tags: Tag[]

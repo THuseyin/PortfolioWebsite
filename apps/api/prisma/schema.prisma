@@ -13,15 +13,16 @@ enum ArticleStatus {
 }
 
 model Article {
-  id          String        @id @default(uuid(7)) @db.Uuid
-  title       String        @default("Untitled")
-  slug        String?       @unique
-  summary     String?
-  content     Json?
-  status      ArticleStatus @default(DRAFT)
-  publishedAt DateTime?     @db.Timestamptz(3)
-  createdAt   DateTime      @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime      @updatedAt @db.Timestamptz(3)
+  id             String        @id @default(uuid(7)) @db.Uuid
+  title          String        @default("Untitled")
+  slug           String?       @unique
+  summary        String?
+  headerImageUrl String?
+  content        Json?
+  status         ArticleStatus @default(DRAFT)
+  publishedAt    DateTime?     @db.Timestamptz(3)
+  createdAt      DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(3)
 
   categoryId String?      @db.Uuid
   category   Category?    @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)

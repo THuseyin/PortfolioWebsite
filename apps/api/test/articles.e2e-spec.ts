@@ -29,6 +29,7 @@ describe('Articles HTTP API (e2e)', () => {
     title: 'Untitled',
     slug: null,
     summary: null,
+    headerImageUrl: null,
     content: null,
     status: ArticleStatus.DRAFT,
     publishedAt: null,
