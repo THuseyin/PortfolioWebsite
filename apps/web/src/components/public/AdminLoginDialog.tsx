@@ -40,21 +40,20 @@ export function AdminLoginDialog() {
       return
     }
 
-    const adminWindow = window.open('about:blank', '_blank')
-    if (!adminWindow) {
-      setFormError('Allow pop-ups for this site, then try again.')
-      return
-    }
-    adminWindow.opener = null
-
     try {
       const session = await loginMutation.mutateAsync({ username, password })
       queryClient.setQueryData(authQueries.session().queryKey, session)
+
+      const adminWindow = window.open('/admin', '_blank')
+      if (!adminWindow) {
+        setFormError('Login succeeded. Allow pop-ups for this site to open the admin workspace.')
+        return
+      }
+      adminWindow.opener = null
+
       form.reset()
       handleOpenChange(false)
-      adminWindow.location.href = '/admin'
     } catch (error) {
-      adminWindow.close()
       setFormError(
         error instanceof ApiError && error.status === 401
           ? 'The username or password is incorrect.'
