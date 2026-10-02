@@ -1,7 +1,17 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 
 import { AdminAuthGuard } from '../auth/guards/admin-auth.guard.js';
 import { ArticlesService } from './articles.service.js';
+import { UpdateArticleDto } from './dto/update-article.dto.js';
 
 @Controller('admin/articles')
 @UseGuards(AdminAuthGuard)
@@ -16,5 +26,14 @@ export class AdminArticlesController {
   @Post()
   createDraft() {
     return this.articlesService.createDraft();
+  }
+
+  @Patch(':id')
+  updateDraft(
+    @Param('id', new ParseUUIDPipe({ version: '7' }))
+    id: string,
+    @Body() updateArticleDto: UpdateArticleDto,
+  ) {
+    return this.articlesService.updateDraft(id, updateArticleDto);
   }
 }
