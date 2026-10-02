@@ -6,6 +6,7 @@ import { AppService } from './app.service.js';
 import { ArticlesModule } from './articles/articles.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
+import { MediaModule } from './media/media.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { TagsModule } from './tags/tags.module.js';
 
@@ -20,6 +21,7 @@ import { TagsModule } from './tags/tags.module.js';
     CategoriesModule,
     TagsModule,
     ArticlesModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
