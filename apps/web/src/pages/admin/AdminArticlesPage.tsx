@@ -1,6 +1,7 @@
+import * as Dialog from '@radix-ui/react-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, ArrowRight, ExternalLink, FilePlus2, Pencil, Search, Trash2 } from 'lucide-react'
-import { useState, type FormEvent } from 'react'
+import { ArrowLeft, ArrowRight, Check, ExternalLink, FilePlus2, Pencil, Search, Trash2, X } from 'lucide-react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router'
 
 import {
@@ -23,6 +24,8 @@ export function AdminArticlesPage() {
   const queryClient = useQueryClient()
   const [searchInput, setSearchInput] = useState(searchParams.get('search') ?? '')
   const [actionError, setActionError] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<AdminArticleSummary | null>(null)
+  const [notification, setNotification] = useState<string | null>(null)
   const requestedPage = Number(searchParams.get('page') ?? '1')
   const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1
   const statusParam = searchParams.get('status')
@@ -39,19 +42,35 @@ export function AdminArticlesPage() {
   })
   const publishMutation = useMutation({
     mutationFn: publishAdminArticle,
-    onSuccess: refreshArticles,
+    onSuccess: () => {
+      refreshArticles()
+      setNotification('Article published successfully.')
+    },
     onError: showActionError,
   })
   const unpublishMutation = useMutation({
     mutationFn: unpublishAdminArticle,
-    onSuccess: refreshArticles,
+    onSuccess: () => {
+      refreshArticles()
+      setNotification('Article returned to draft.')
+    },
     onError: showActionError,
   })
   const deleteMutation = useMutation({
     mutationFn: deleteAdminArticle,
-    onSuccess: refreshArticles,
+    onSuccess: () => {
+      refreshArticles()
+      setDeleteTarget(null)
+      setNotification('Article deleted.')
+    },
     onError: showActionError,
   })
+
+  useEffect(() => {
+    if (!notification) return
+    const timer = window.setTimeout(() => setNotification(null), 3_500)
+    return () => window.clearTimeout(timer)
+  }, [notification])
 
   function showActionError(error: Error) {
     if (error instanceof ApiError && error.status === 401) {
@@ -75,16 +94,13 @@ export function AdminArticlesPage() {
     updateFilters({ search: searchInput.trim() || undefined, page: undefined })
   }
 
-  const handleDelete = (article: AdminArticleSummary) => {
-    const confirmed = window.confirm(`Delete “${article.title}”? This cannot be undone.`)
-    if (confirmed) {
-      setActionError(null)
-      deleteMutation.mutate(article.id)
-    }
-  }
-
-  const pendingArticleId =
-    publishMutation.variables ?? unpublishMutation.variables ?? deleteMutation.variables
+  const pendingAction = publishMutation.isPending
+    ? { id: publishMutation.variables, type: 'publish' as const }
+    : unpublishMutation.isPending
+      ? { id: unpublishMutation.variables, type: 'unpublish' as const }
+      : deleteMutation.isPending
+        ? { id: deleteMutation.variables, type: 'delete' as const }
+        : null
   const pagination = articlesQuery.data?.pagination
 
   if (articlesQuery.error instanceof ApiError && articlesQuery.error.status === 401) {
@@ -152,9 +168,9 @@ export function AdminArticlesPage() {
         {articlesQuery.data?.items.map((article) => (
           <AdminArticleRow
             article={article}
-            busy={pendingArticleId === article.id}
+            busyAction={pendingAction?.id === article.id ? pendingAction.type : null}
             key={article.id}
-            onDelete={() => handleDelete(article)}
+            onDelete={() => setDeleteTarget(article)}
             onPublish={() => {
               setActionError(null)
               publishMutation.mutate(article.id)
@@ -178,19 +194,40 @@ export function AdminArticlesPage() {
           </button>
         </nav>
       )}
+
+      <DeleteArticleDialog
+        article={deleteTarget}
+        deleting={deleteMutation.isPending}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (!deleteTarget) return
+          setActionError(null)
+          deleteMutation.mutate(deleteTarget.id)
+        }}
+      />
+
+      {notification && (
+        <div className="admin-toast" role="status">
+          <Check aria-hidden="true" />
+          <span>{notification}</span>
+          <button type="button" aria-label="Dismiss notification" onClick={() => setNotification(null)}>
+            <X aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </main>
   )
 }
 
 type AdminArticleRowProps = {
   article: AdminArticleSummary
-  busy: boolean
+  busyAction: 'delete' | 'publish' | 'unpublish' | null
   onDelete: () => void
   onPublish: () => void
   onUnpublish: () => void
 }
 
-function AdminArticleRow({ article, busy, onDelete, onPublish, onUnpublish }: AdminArticleRowProps) {
+function AdminArticleRow({ article, busyAction, onDelete, onPublish, onUnpublish }: AdminArticleRowProps) {
   const updatedAt = new Intl.DateTimeFormat('en-GB', {
     day: '2-digit', month: 'short', year: 'numeric',
   }).format(new Date(article.updatedAt))
@@ -208,9 +245,13 @@ function AdminArticleRow({ article, busy, onDelete, onPublish, onUnpublish }: Ad
       <time dateTime={article.updatedAt}>{updatedAt}</time>
       <div className="admin-article-row__actions">
         {article.status === 'DRAFT' ? (
-          <button disabled={busy} type="button" onClick={onPublish}>Publish</button>
+          <button disabled={Boolean(busyAction)} type="button" onClick={onPublish}>
+            {busyAction === 'publish' ? 'Publishing…' : 'Publish'}
+          </button>
         ) : (
-          <button disabled={busy} type="button" onClick={onUnpublish}>Unpublish</button>
+          <button disabled={Boolean(busyAction)} type="button" onClick={onUnpublish}>
+            {busyAction === 'unpublish' ? 'Updating…' : 'Unpublish'}
+          </button>
         )}
         {article.slug && article.status === 'PUBLISHED' && (
           <Link title="Open public article" target="_blank" rel="noreferrer" to={`/articles/${article.slug}`}>
@@ -220,11 +261,42 @@ function AdminArticleRow({ article, busy, onDelete, onPublish, onUnpublish }: Ad
         <Link title="Edit article" to={`/admin/articles/${article.id}/edit`}>
           <Pencil aria-hidden="true" /><span className="sr-only">Edit article</span>
         </Link>
-        <button className="admin-icon-button" title="Delete article" disabled={busy} type="button" onClick={onDelete}>
+        <button className="admin-icon-button" title="Delete article" disabled={Boolean(busyAction)} type="button" onClick={onDelete}>
           <Trash2 aria-hidden="true" /><span className="sr-only">Delete article</span>
         </button>
       </div>
     </article>
+  )
+}
+
+function DeleteArticleDialog({ article, deleting, onCancel, onConfirm }: {
+  article: AdminArticleSummary | null
+  deleting: boolean
+  onCancel: () => void
+  onConfirm: () => void
+}) {
+  return (
+    <Dialog.Root open={Boolean(article)} onOpenChange={(open) => { if (!open && !deleting) onCancel() }}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="admin-confirm-overlay" />
+        <Dialog.Content className="admin-confirm-dialog">
+          <div className="admin-confirm-dialog__index">
+            <span className="eyebrow">Destructive action</span>
+            <Dialog.Close disabled={deleting} aria-label="Close delete confirmation"><X aria-hidden="true" /></Dialog.Close>
+          </div>
+          <Dialog.Title>Delete this article?</Dialog.Title>
+          <Dialog.Description>
+            “{article?.title}” will be permanently removed. This action cannot be undone.
+          </Dialog.Description>
+          <div className="admin-confirm-dialog__actions">
+            <Dialog.Close disabled={deleting}>Keep article</Dialog.Close>
+            <button type="button" disabled={deleting} onClick={onConfirm}>
+              {deleting ? 'Deleting…' : 'Delete permanently'}
+            </button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 
