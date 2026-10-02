@@ -104,6 +104,37 @@ describe('ArticlesService', () => {
     expect(result.tags).toEqual([tag]);
   });
 
+  it('returns a complete article for the admin editor', async () => {
+    prisma.article.findUnique.mockResolvedValue(articleResult);
+
+    const result = await service.findByIdForAdmin(articleResult.id);
+
+    expect(prisma.article.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: articleResult.id },
+        select: expect.objectContaining({
+          content: true,
+          summary: true,
+          status: true,
+          category: expect.any(Object),
+          tags: expect.any(Object),
+        }),
+      }),
+    );
+    expect(result).toEqual({
+      ...articleResult,
+      tags: [tag],
+    });
+  });
+
+  it('returns not found when the admin article does not exist', async () => {
+    prisma.article.findUnique.mockResolvedValue(null);
+
+    await expect(service.findByIdForAdmin(articleResult.id)).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
   it('updates category and tag relations in one transaction', async () => {
     transaction.article.findUnique.mockResolvedValue({
       id: articleResult.id,

@@ -59,6 +59,55 @@ export class ArticlesService {
     }));
   }
 
+  async findByIdForAdmin(id: string) {
+    const article = await this.prisma.article.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        summary: true,
+        content: true,
+        status: true,
+        publishedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        tags: {
+          select: {
+            tag: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+          },
+          orderBy: {
+            tag: {
+              name: 'asc',
+            },
+          },
+        },
+      },
+    });
+
+    if (!article) {
+      throw new NotFoundException('Article not found');
+    }
+
+    return {
+      ...article,
+      tags: article.tags.map(({ tag }) => tag),
+    };
+  }
+
   async createDraft() {
     const article = await this.prisma.article.create({
       data: {},

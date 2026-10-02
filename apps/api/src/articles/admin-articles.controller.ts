@@ -26,6 +26,14 @@ export class AdminArticlesController {
     return this.articlesService.findAllForAdmin();
   }
 
+  @Get(':id')
+  findById(
+    @Param('id', new ParseUUIDPipe({ version: '7' }))
+    id: string,
+  ) {
+    return this.articlesService.findByIdForAdmin(id);
+  }
+
   @Post()
   createDraft() {
     return this.articlesService.createDraft();
