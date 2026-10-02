@@ -8,55 +8,77 @@ import {
 import { createSlug } from '../common/utils/create-slug.js';
 import { ArticleStatus, Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { AdminArticlesQueryDto } from './dto/admin-articles-query.dto.js';
+import { PublicArticlesQueryDto } from './dto/public-articles-query.dto.js';
 import { UpdateArticleDto } from './dto/update-article.dto.js';
 
 @Injectable()
 export class ArticlesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAllForAdmin() {
-    const articles = await this.prisma.article.findMany({
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        status: true,
-        publishedAt: true,
-        createdAt: true,
-        updatedAt: true,
-        category: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
+  async findAllForAdmin(query: AdminArticlesQueryDto) {
+    const where: Prisma.ArticleWhereInput = {
+      status: query.status,
+      title: query.search
+        ? {
+            contains: query.search,
+            mode: 'insensitive',
+          }
+        : undefined,
+    };
+    const skip = (query.page - 1) * query.limit;
+
+    const [articles, totalItems] = await Promise.all([
+      this.prisma.article.findMany({
+        where,
+        skip,
+        take: query.limit,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          status: true,
+          publishedAt: true,
+          createdAt: true,
+          updatedAt: true,
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
           },
-        },
-        tags: {
-          select: {
-            tag: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
+          tags: {
+            select: {
+              tag: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
+            },
+            orderBy: {
+              tag: {
+                name: 'asc',
               },
             },
           },
-          orderBy: {
-            tag: {
-              name: 'asc',
-            },
-          },
         },
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      }),
+      this.prisma.article.count({ where }),
+    ]);
 
-    return articles.map((article) => ({
-      ...article,
-      tags: article.tags.map(({ tag }) => tag),
-    }));
+    return {
+      items: articles.map((article) => ({
+        ...article,
+        tags: article.tags.map(({ tag }) => tag),
+      })),
+      pagination: this.createPagination(query.page, query.limit, totalItems),
+    };
   }
 
   async findByIdForAdmin(id: string) {
@@ -455,34 +477,55 @@ export class ArticlesService {
     }
   }
 
-  async findAllPublished() {
-    const articles = await this.prisma.article.findMany({
-      where: { status: ArticleStatus.PUBLISHED },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        summary: true,
-        publishedAt: true,
-        category: {
-          select: { id: true, name: true, slug: true },
-        },
-        tags: {
-          select: {
-            tag: {
-              select: { id: true, name: true, slug: true },
+  async findAllPublished(query: PublicArticlesQueryDto) {
+    const where: Prisma.ArticleWhereInput = {
+      status: ArticleStatus.PUBLISHED,
+      category: query.category ? { slug: query.category } : undefined,
+      tags: query.tag
+        ? {
+            some: {
+              tag: { slug: query.tag },
             },
-          },
-          orderBy: { tag: { name: 'asc' } },
-        },
-      },
-      orderBy: { publishedAt: 'desc' },
-    });
+          }
+        : undefined,
+    };
+    const skip = (query.page - 1) * query.limit;
 
-    return articles.map((article) => ({
-      ...article,
-      tags: article.tags.map(({ tag }) => tag),
-    }));
+    const [articles, totalItems] = await Promise.all([
+      this.prisma.article.findMany({
+        where,
+        skip,
+        take: query.limit,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          summary: true,
+          publishedAt: true,
+          category: {
+            select: { id: true, name: true, slug: true },
+          },
+          tags: {
+            select: {
+              tag: {
+                select: { id: true, name: true, slug: true },
+              },
+            },
+            orderBy: { tag: { name: 'asc' } },
+          },
+        },
+        orderBy: { publishedAt: 'desc' },
+      }),
+      this.prisma.article.count({ where }),
+    ]);
+
+    return {
+      items: articles.map((article) => ({
+        ...article,
+        tags: article.tags.map(({ tag }) => tag),
+      })),
+      pagination: this.createPagination(query.page, query.limit, totalItems),
+    };
   }
 
   async findPublishedBySlug(slug: string) {
@@ -519,6 +562,15 @@ export class ArticlesService {
     return {
       ...article,
       tags: article.tags.map(({ tag }) => tag),
+    };
+  }
+
+  private createPagination(page: number, limit: number, totalItems: number) {
+    return {
+      page,
+      limit,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
     };
   }
 }

@@ -17,6 +17,7 @@ describe('Articles HTTP API (e2e)', () => {
   let prisma: {
     article: {
       findMany: ReturnType<typeof vi.fn>;
+      count: ReturnType<typeof vi.fn>;
       findUnique: ReturnType<typeof vi.fn>;
       findFirst: ReturnType<typeof vi.fn>;
       create: ReturnType<typeof vi.fn>;
@@ -41,6 +42,7 @@ describe('Articles HTTP API (e2e)', () => {
     prisma = {
       article: {
         findMany: vi.fn(),
+        count: vi.fn(),
         findUnique: vi.fn(),
         findFirst: vi.fn(),
         create: vi.fn(),
@@ -120,16 +122,36 @@ describe('Articles HTTP API (e2e)', () => {
 
   it('uses the published-only query for the public list', async () => {
     prisma.article.findMany.mockResolvedValue([]);
+    prisma.article.count.mockResolvedValue(0);
 
-    await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .get('/api/articles')
-      .expect(200)
-      .expect([]);
+      .expect(200);
+
+    expect(response.body).toEqual({
+      items: [],
+      pagination: {
+        page: 1,
+        limit: 10,
+        totalItems: 0,
+        totalPages: 0,
+      },
+    });
 
     expect(prisma.article.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { status: ArticleStatus.PUBLISHED },
+        where: expect.objectContaining({
+          status: ArticleStatus.PUBLISHED,
+        }),
       }),
     );
+  });
+
+  it('rejects invalid public pagination values', async () => {
+    await request(app.getHttpServer())
+      .get('/api/articles?page=0&limit=100')
+      .expect(400);
+
+    expect(prisma.article.findMany).not.toHaveBeenCalled();
   });
 });

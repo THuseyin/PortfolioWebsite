@@ -1,14 +1,15 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 
 import { ArticlesService } from './articles.service.js';
+import { PublicArticlesQueryDto } from './dto/public-articles-query.dto.js';
 
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @Get()
-  findAll() {
-    return this.articlesService.findAllPublished();
+  findAll(@Query() query: PublicArticlesQueryDto) {
+    return this.articlesService.findAllPublished(query);
   }
 
   @Get(':slug')

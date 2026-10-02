@@ -26,6 +26,7 @@ describe('ArticlesService', () => {
   let prisma: {
     article: {
       findMany: ReturnType<typeof vi.fn>;
+      count: ReturnType<typeof vi.fn>;
       findFirst: ReturnType<typeof vi.fn>;
       findUnique: ReturnType<typeof vi.fn>;
       create: ReturnType<typeof vi.fn>;
@@ -78,6 +79,7 @@ describe('ArticlesService', () => {
     prisma = {
       article: {
         findMany: vi.fn(),
+        count: vi.fn(),
         findFirst: vi.fn(),
         findUnique: vi.fn(),
         create: vi.fn(),
@@ -240,15 +242,69 @@ describe('ArticlesService', () => {
 
   it('returns only published articles and flattens tags', async () => {
     prisma.article.findMany.mockResolvedValue([articleResult]);
+    prisma.article.count.mockResolvedValue(1);
 
-    const result = await service.findAllPublished();
+    const result = await service.findAllPublished({
+      page: 1,
+      limit: 10,
+      category: 'development',
+      tag: 'nestjs',
+    });
 
     expect(prisma.article.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { status: ArticleStatus.PUBLISHED },
+        skip: 0,
+        take: 10,
+        where: expect.objectContaining({
+          status: ArticleStatus.PUBLISHED,
+          category: { slug: 'development' },
+          tags: {
+            some: {
+              tag: { slug: 'nestjs' },
+            },
+          },
+        }),
       }),
     );
-    expect(result[0]?.tags).toEqual([tag]);
+    expect(result.items[0]?.tags).toEqual([tag]);
+    expect(result.pagination).toEqual({
+      page: 1,
+      limit: 10,
+      totalItems: 1,
+      totalPages: 1,
+    });
+  });
+
+  it('applies status, search and pagination to the admin list', async () => {
+    prisma.article.findMany.mockResolvedValue([articleResult]);
+    prisma.article.count.mockResolvedValue(21);
+
+    const result = await service.findAllForAdmin({
+      page: 2,
+      limit: 20,
+      status: ArticleStatus.DRAFT,
+      search: 'NestJS',
+    });
+
+    expect(prisma.article.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skip: 20,
+        take: 20,
+        where: {
+          status: ArticleStatus.DRAFT,
+          title: {
+            contains: 'NestJS',
+            mode: 'insensitive',
+          },
+        },
+      }),
+    );
+    expect(result.pagination).toEqual({
+      page: 2,
+      limit: 20,
+      totalItems: 21,
+      totalPages: 2,
+    });
   });
 
   it('hides missing or unpublished articles from public detail', async () => {

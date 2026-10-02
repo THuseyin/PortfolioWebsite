@@ -9,11 +9,13 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
 import { AdminAuthGuard } from '../auth/guards/admin-auth.guard.js';
 import { ArticlesService } from './articles.service.js';
+import { AdminArticlesQueryDto } from './dto/admin-articles-query.dto.js';
 import { UpdateArticleDto } from './dto/update-article.dto.js';
 
 @Controller('admin/articles')
@@ -22,8 +24,8 @@ export class AdminArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
   @Get()
-  findAll() {
-    return this.articlesService.findAllForAdmin();
+  findAll(@Query() query: AdminArticlesQueryDto) {
+    return this.articlesService.findAllForAdmin(query);
   }
 
   @Get(':id')
