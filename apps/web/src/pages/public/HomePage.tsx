@@ -1,3 +1,3 @@
 export function HomePage() {
-  return <main>Home</main>
+  return <p className="route-placeholder">Home page — design pending</p>
 }

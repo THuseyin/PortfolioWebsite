@@ -1,3 +1,3 @@
 export function ArticleDetailPage() {
-  return <main>Article detail</main>
+  return <p className="route-placeholder">Article detail — design pending</p>
 }

@@ -1,3 +1,3 @@
 export function CategoryArticlesPage() {
-  return <main>Category articles</main>
+  return <p className="route-placeholder">Category articles — design pending</p>
 }
