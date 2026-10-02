@@ -4,27 +4,10 @@
   padding: 0 var(--page-gutter) 1.5rem;
 }
 
-.site-footer__lead {
-  display: grid;
-  padding-block: clamp(2rem, 5vw, 4rem);
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--line);
-  grid-template-columns: minmax(10rem, 1fr) minmax(15rem, 2fr);
-  gap: 2rem;
-}
-
-.site-footer__statement {
-  max-width: 45rem;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 4vw, 3.8rem);
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
 .site-footer__meta {
   display: flex;
   padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
   align-items: center;
   color: var(--muted);
   font-family: var(--font-mono);
@@ -64,10 +47,6 @@
 }
 
 @media (max-width: 42rem) {
-  .site-footer__lead {
-    grid-template-columns: 1fr;
-  }
-
   .site-footer__meta {
     display: grid;
     grid-template-columns: 1fr auto;

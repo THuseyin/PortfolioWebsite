@@ -24,28 +24,13 @@ export function ArticlesPage() {
   return (
     <div className="archive-page">
       <header className="archive-hero">
-        <div className="archive-hero__index">
-          <p className="eyebrow">Index / All writing</p>
-          <span className="archive-hero__count">
-            {pagination ? String(pagination.totalItems).padStart(2, '0') : '—'} notes
-          </span>
-        </div>
-        <div className="archive-hero__title">
-          <h1>Archive</h1>
-          <p>
-            Field notes on systems, interfaces, software, and the experiments in between.
-          </p>
-        </div>
+        <h1>All Articles</h1>
+        <span className="archive-hero__count">
+          {pagination ? String(pagination.totalItems).padStart(2, '0') : '—'} notes
+        </span>
       </header>
 
       <section className="archive-list" aria-label="Article archive">
-        <div className="archive-list__heading">
-          <span>No.</span>
-          <span>Note</span>
-          <span>Filed under</span>
-          <span>Date</span>
-        </div>
-
         {articlesQuery.isPending && <ArchiveLoading />}
         {articlesQuery.isError && (
           <ArchiveMessage
@@ -102,15 +87,21 @@ function ArchiveRow({ article, index }: { article: ArticleSummary; index: number
 
   return (
     <Link className="archive-row" to={`/articles/${article.slug}`}>
-      <span className="archive-row__number">{String(index).padStart(2, '0')}</span>
+      <div className="archive-row__image">
+        <img
+          src={`/images/home-collage/collage-${String(((index - 1) % 12) + 1).padStart(2, '0')}.jpg`}
+          alt=""
+        />
+        <span>{String(index).padStart(2, '0')}</span>
+      </div>
       <span className="archive-row__content">
+        <span className="archive-row__meta">
+          <span>{article.category?.name ?? 'Uncategorized'}</span>
+          <time dateTime={article.publishedAt}>{date}</time>
+        </span>
         <strong>{article.title}</strong>
         {article.summary && <small>{article.summary}</small>}
       </span>
-      <span className="archive-row__category">
-        {article.category?.name ?? 'Uncategorized'}
-      </span>
-      <time dateTime={article.publishedAt}>{date}</time>
       <ArrowUpRight className="archive-row__arrow" aria-hidden="true" />
     </Link>
   )

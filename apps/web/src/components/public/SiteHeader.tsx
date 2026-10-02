@@ -26,11 +26,7 @@ export function SiteHeader() {
       <div className="site-header__bar">
         <Link className="site-identity" to="/" aria-label="Go to home page">
           <span className="site-identity__mark" aria-hidden="true">
-            P
-          </span>
-          <span className="site-identity__copy">
-            <strong>Portfolio</strong>
-            <small>Notes & experiments</small>
+            HT
           </span>
         </Link>
 

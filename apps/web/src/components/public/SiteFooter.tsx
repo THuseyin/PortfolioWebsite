@@ -8,12 +8,6 @@ export function SiteFooter() {
 
   return (
     <footer className="site-footer">
-      <div className="site-footer__lead">
-        <p className="eyebrow">End note / {currentYear}</p>
-        <p className="site-footer__statement">
-          Built as a living archive of work, notes, and digital experiments.
-        </p>
-      </div>
       <div className="site-footer__meta">
         <span>© {currentYear}</span>
         <Link to="/articles">
