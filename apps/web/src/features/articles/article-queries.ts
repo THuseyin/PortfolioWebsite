@@ -4,6 +4,11 @@ import { apiRequest } from '../../lib/api-client'
 import type { PaginatedArticles } from '../../types/article'
 
 export const articleQueries = {
+  all: (page = 1, limit = 8) =>
+    queryOptions({
+      queryKey: ['articles', 'all', page, limit],
+      queryFn: () => apiRequest<PaginatedArticles>(`/articles?page=${page}&limit=${limit}`),
+    }),
   latest: (limit = 3) =>
     queryOptions({
       queryKey: ['articles', 'latest', limit],
