@@ -3,7 +3,9 @@ import { createBrowserRouter } from 'react-router'
 import { AdminLayout } from '../layouts/AdminLayout'
 import { PublicLayout } from '../layouts/PublicLayout'
 import { AdminArticlesPage } from '../pages/admin/AdminArticlesPage'
+import { AdminCategoriesPage } from '../pages/admin/AdminCategoriesPage'
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage'
+import { AdminTagsPage } from '../pages/admin/AdminTagsPage'
 import { ArticleDetailPage } from '../pages/public/ArticleDetailPage'
 import { ArticlesPage } from '../pages/public/ArticlesPage'
 import { CategoryArticlesPage } from '../pages/public/CategoryArticlesPage'
@@ -28,6 +30,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: 'articles', element: <AdminArticlesPage /> },
+      { path: 'categories', element: <AdminCategoriesPage /> },
+      { path: 'tags', element: <AdminTagsPage /> },
       {
         path: 'articles/new',
         lazy: async () => {

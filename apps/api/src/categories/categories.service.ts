@@ -76,6 +76,7 @@ export class CategoriesService {
         },
         data: {
           name: updateCategoryDto.name.trim(),
+          slug: updateCategoryDto.slug,
         },
         select: {
           id: true,
@@ -96,7 +97,7 @@ export class CategoriesService {
 
         if (error.code === 'P2002') {
           throw new ConflictException(
-            'A category with this name already exists',
+            'A category with this name or slug already exists',
           );
         }
       }

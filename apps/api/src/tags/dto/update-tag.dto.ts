@@ -1,5 +1,11 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class UpdateTagDto {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
@@ -7,4 +13,14 @@ export class UpdateTagDto {
   @IsNotEmpty()
   @MaxLength(80)
   name!: string;
+
+  @IsOptional()
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim().toLowerCase() : value,
+  )
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(120)
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+  slug?: string;
 }

@@ -70,6 +70,7 @@ export class TagsService {
         },
         data: {
           name: updateTagDto.name.trim(),
+          slug: updateTagDto.slug,
         },
         select: {
           id: true,
@@ -84,7 +85,9 @@ export class TagsService {
         }
 
         if (error.code === 'P2002') {
-          throw new ConflictException('A tag with this name already exists');
+          throw new ConflictException(
+            'A tag with this name or slug already exists',
+          );
         }
       }
 

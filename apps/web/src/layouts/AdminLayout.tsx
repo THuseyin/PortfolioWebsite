@@ -32,6 +32,8 @@ export function AdminLayout() {
         <nav aria-label="Admin navigation">
           <NavLink to="/admin" end>Dashboard</NavLink>
           <NavLink to="/admin/articles">Articles</NavLink>
+          <NavLink to="/admin/categories">Categories</NavLink>
+          <NavLink to="/admin/tags">Tags</NavLink>
         </nav>
         <button
           type="button"
