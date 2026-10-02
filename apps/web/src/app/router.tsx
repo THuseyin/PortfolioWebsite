@@ -12,10 +12,10 @@ import { HomePage } from '../pages/public/HomePage'
 import { NotFoundPage } from '../pages/shared/NotFoundPage'
 
 export const router = createBrowserRouter([
+  { index: true, element: <HomePage /> },
   {
     element: <PublicLayout />,
     children: [
-      { index: true, element: <HomePage /> },
       { path: 'articles', element: <ArticlesPage /> },
       { path: 'articles/:slug', element: <ArticleDetailPage /> },
       { path: 'categories/:categorySlug', element: <CategoryArticlesPage /> },
