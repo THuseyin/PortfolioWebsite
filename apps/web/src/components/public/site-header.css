@@ -32,16 +32,18 @@
   width: 2.75rem;
   height: 2.75rem;
   border: 1px solid currentColor;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: -0.04em;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-style: italic;
   place-items: center;
-  transition: color 300ms ease, background 300ms ease;
+  transform: rotate(-3deg);
+  transition: color 180ms ease, background 180ms ease, transform 180ms ease;
 }
 
 .site-identity:hover .site-identity__mark {
   color: var(--signal-contrast);
   background: var(--signal);
+  transform: rotate(3deg);
 }
 
 .desktop-navigation {
