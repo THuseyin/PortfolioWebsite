@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -35,5 +37,14 @@ export class AdminArticlesController {
     @Body() updateArticleDto: UpdateArticleDto,
   ) {
     return this.articlesService.updateDraft(id, updateArticleDto);
+  }
+
+  @Post(':id/publish')
+  @HttpCode(HttpStatus.OK)
+  publish(
+    @Param('id', new ParseUUIDPipe({ version: '7' }))
+    id: string,
+  ) {
+    return this.articlesService.publish(id);
   }
 }
