@@ -1,10 +1,60 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import connectPgSimple from 'connect-pg-simple';
+import session from 'express-session';
 
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  const isProduction =
+    configService.get('NODE_ENV') === 'production';
+
+  const PostgreSqlSessionStore =
+    connectPgSimple(session);
+
+  if (isProduction) {
+    app.getHttpAdapter()
+      .getInstance()
+      .set('trust proxy', 1);
+  }
+
+  app.enableCors({
+    origin:
+      configService.getOrThrow<string>('WEB_ORIGIN'),
+    credentials: true,
+  });
+
+  app.use(
+    session({
+      name: 'portfolio.sid',
+      secret:
+        configService.getOrThrow<string>(
+          'SESSION_SECRET',
+        ),
+      store: new PostgreSqlSessionStore({
+        conString:
+          configService.getOrThrow<string>(
+            'DATABASE_URL',
+          ),
+        tableName: 'session',
+        createTableIfMissing: false,
+      }),
+      resave: false,
+      saveUninitialized: false,
+      rolling: true,
+      cookie: {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: isProduction,
+        maxAge: 8 * 60 * 60 * 1000,
+      },
+    }),
+  );
 
   app.setGlobalPrefix('api');
 
