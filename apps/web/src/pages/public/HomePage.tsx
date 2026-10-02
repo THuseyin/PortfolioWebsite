@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowDown, ArrowUpRight } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, AtSign } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 
 import { AdminLoginDialog } from '../../components/public/AdminLoginDialog'
+import { HomeNavigation } from '../../components/public/HomeNavigation'
 import { articleQueries } from '../../features/articles/article-queries'
 import type { ArticleSummary } from '../../types/article'
 import './home-page.css'
@@ -14,36 +15,6 @@ const collageRows = [
   [1, 2, 3, 4],
   [5, 6, 7, 8],
   [9, 10, 11, 12],
-]
-
-const fallbackArticles: ArticleSummary[] = [
-  {
-    id: 'placeholder-01',
-    title: 'Notes on building things that feel alive',
-    slug: '',
-    summary: 'A temporary article card shown until the API has published content.',
-    publishedAt: new Date().toISOString(),
-    category: { id: 'placeholder', name: 'Experiments', slug: 'experiments' },
-    tags: [],
-  },
-  {
-    id: 'placeholder-02',
-    title: 'The space between systems and interfaces',
-    slug: '',
-    summary: null,
-    publishedAt: new Date().toISOString(),
-    category: { id: 'placeholder', name: 'Development', slug: 'development' },
-    tags: [],
-  },
-  {
-    id: 'placeholder-03',
-    title: 'A small archive of unfinished ideas',
-    slug: '',
-    summary: null,
-    publishedAt: new Date().toISOString(),
-    category: { id: 'placeholder', name: 'Notes', slug: 'notes' },
-    tags: [],
-  },
 ]
 
 export function HomePage() {
@@ -119,17 +90,16 @@ export function HomePage() {
         </div>
         <div className="about-panel__body">
           <h2>
-            I build software,
+            I came,
             <br />
-            write what I learn,
+            I wandered,
             <br />
-            and keep experimenting.
+            I learned —
+            <br />
+            now I write.
           </h2>
           <div className="about-panel__note">
-            <p>
-              This is a living archive of projects, technical notes, and ideas in progress.
-              The work sits somewhere between engineering, editorial design, and curiosity.
-            </p>
+            <p>Notes shaped by curiosity, practice, and experience.</p>
             <dl>
               <div>
                 <dt>Currently</dt>
@@ -143,6 +113,14 @@ export function HomePage() {
             <Link className="text-link" to="/articles">
               Explore the archive <ArrowUpRight aria-hidden="true" />
             </Link>
+            <a
+              className="text-link"
+              href="https://www.instagram.com/tepee.huseyin/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <AtSign aria-hidden="true" /> tepee.huseyin
+            </a>
           </div>
         </div>
         <p className="about-panel__footer">© {new Date().getFullYear()} Hüseyin Tepe</p>
@@ -161,7 +139,7 @@ function HomeChrome({ activeSection }: { activeSection: number }) {
           HT
         </a>
         <nav aria-label="Homepage shortcuts">
-          <a href="#recent-notes">Index</a>
+          <HomeNavigation />
           <AdminLoginDialog />
         </nav>
       </div>
@@ -245,9 +223,7 @@ function CityTime({ city, timeZone, now }: { city: string; timeZone: string; now
 
 function LatestArticlesSection() {
   const latestArticlesQuery = useQuery(articleQueries.latest(3))
-  const articles = latestArticlesQuery.data?.items.length
-    ? latestArticlesQuery.data.items
-    : fallbackArticles
+  const articles = latestArticlesQuery.data?.items ?? []
 
   return (
     <section className="home-panel articles-panel" id="recent-notes" data-home-section="2">
@@ -257,14 +233,45 @@ function LatestArticlesSection() {
         <Link to="/articles">View all ↗</Link>
       </div>
       <div className="article-grid">
-        {articles.map((article, index) => (
-          <ArticleCard article={article} index={index} key={article.id} />
-        ))}
+        {latestArticlesQuery.isPending && <ArticleLoadingState />}
+        {latestArticlesQuery.isError && (
+          <ArticleMessageState
+            title="The archive is offline"
+            message="Start the API to load published articles."
+          />
+        )}
+        {latestArticlesQuery.isSuccess && !articles.length && (
+          <ArticleMessageState
+            title="No published notes yet"
+            message="Published articles will appear here."
+          />
+        )}
+        {latestArticlesQuery.isSuccess &&
+          articles.map((article, index) => (
+            <ArticleCard article={article} index={index} key={article.id} />
+          ))}
       </div>
-      {latestArticlesQuery.isError && (
-        <p className="articles-panel__status">Preview content — API is currently unavailable.</p>
-      )}
     </section>
+  )
+}
+
+function ArticleLoadingState() {
+  return (
+    <div className="article-state article-state--loading" aria-label="Loading recent articles">
+      <span />
+      <span />
+      <span />
+    </div>
+  )
+}
+
+function ArticleMessageState({ title, message }: { title: string; message: string }) {
+  return (
+    <div className="article-state article-state--message">
+      <p className="eyebrow">Archive status</p>
+      <h3>{title}</h3>
+      <p>{message}</p>
+    </div>
   )
 }
 
