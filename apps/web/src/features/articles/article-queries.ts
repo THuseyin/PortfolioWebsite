@@ -9,6 +9,14 @@ export const articleQueries = {
       queryKey: ['articles', 'all', page, limit],
       queryFn: () => apiRequest<PaginatedArticles>(`/articles?page=${page}&limit=${limit}`),
     }),
+  byCategory: (category: string, page = 1, limit = 8) =>
+    queryOptions({
+      queryKey: ['articles', 'category', category, page, limit],
+      queryFn: () =>
+        apiRequest<PaginatedArticles>(
+          `/articles?category=${encodeURIComponent(category)}&page=${page}&limit=${limit}`,
+        ),
+    }),
   latest: (limit = 3) =>
     queryOptions({
       queryKey: ['articles', 'latest', limit],
