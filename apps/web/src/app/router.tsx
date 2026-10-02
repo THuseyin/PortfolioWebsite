@@ -2,7 +2,6 @@ import { createBrowserRouter } from 'react-router'
 
 import { AdminLayout } from '../layouts/AdminLayout'
 import { PublicLayout } from '../layouts/PublicLayout'
-import { AdminArticleEditorPage } from '../pages/admin/AdminArticleEditorPage'
 import { AdminArticlesPage } from '../pages/admin/AdminArticlesPage'
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage'
 import { ArticleDetailPage } from '../pages/public/ArticleDetailPage'
@@ -29,8 +28,20 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: 'articles', element: <AdminArticlesPage /> },
-      { path: 'articles/new', element: <AdminArticleEditorPage /> },
-      { path: 'articles/:articleId/edit', element: <AdminArticleEditorPage /> },
+      {
+        path: 'articles/new',
+        lazy: async () => {
+          const { AdminArticleEditorPage } = await import('../pages/admin/AdminArticleEditorPage')
+          return { Component: AdminArticleEditorPage }
+        },
+      },
+      {
+        path: 'articles/:articleId/edit',
+        lazy: async () => {
+          const { AdminArticleEditorPage } = await import('../pages/admin/AdminArticleEditorPage')
+          return { Component: AdminArticleEditorPage }
+        },
+      },
     ],
   },
   { path: '*', element: <NotFoundPage /> },
