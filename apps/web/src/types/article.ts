@@ -17,6 +17,18 @@ export type ArticleSummary = {
   tags: Tag[]
 }
 
+export type TiptapNode = {
+  type: string
+  attrs?: Record<string, unknown>
+  content?: TiptapNode[]
+  marks?: Array<{ type: string; attrs?: Record<string, unknown> }>
+  text?: string
+}
+
+export type ArticleDetail = ArticleSummary & {
+  content: TiptapNode | null
+}
+
 export type PaginatedArticles = {
   items: ArticleSummary[]
   pagination: {

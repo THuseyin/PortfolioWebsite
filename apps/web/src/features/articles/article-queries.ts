@@ -1,9 +1,14 @@
 import { queryOptions } from '@tanstack/react-query'
 
 import { apiRequest } from '../../lib/api-client'
-import type { PaginatedArticles } from '../../types/article'
+import type { ArticleDetail, PaginatedArticles } from '../../types/article'
 
 export const articleQueries = {
+  detail: (slug: string) =>
+    queryOptions({
+      queryKey: ['articles', 'detail', slug],
+      queryFn: () => apiRequest<ArticleDetail>(`/articles/${encodeURIComponent(slug)}`),
+    }),
   all: (page = 1, limit = 8) =>
     queryOptions({
       queryKey: ['articles', 'all', page, limit],
