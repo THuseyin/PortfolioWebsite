@@ -88,17 +88,34 @@
   background: var(--paper);
 }
 
+.login-form input:focus {
+  border-color: var(--signal);
+  outline: none;
+}
+
+.login-form input:disabled { opacity: 0.65; }
+
+.login-form__error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
 .login-form button {
   height: 3.25rem;
   margin-top: 0.5rem;
   border: 0;
   color: color-mix(in srgb, var(--signal-contrast) 60%, transparent);
-  background: color-mix(in srgb, var(--signal) 55%, var(--paper));
+  background: var(--signal);
   font-family: var(--font-mono);
   font-size: 0.65rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  cursor: pointer;
 }
+
+.login-form button:disabled { cursor: wait; opacity: 0.65; }
 
 @keyframes dialog-fade-in {
   from {
