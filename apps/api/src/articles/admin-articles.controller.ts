@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -46,5 +47,23 @@ export class AdminArticlesController {
     id: string,
   ) {
     return this.articlesService.publish(id);
+  }
+
+  @Post(':id/unpublish')
+  @HttpCode(HttpStatus.OK)
+  unpublish(
+    @Param('id', new ParseUUIDPipe({ version: '7' }))
+    id: string,
+  ) {
+    return this.articlesService.unpublish(id);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(
+    @Param('id', new ParseUUIDPipe({ version: '7' }))
+    id: string,
+  ): Promise<void> {
+    await this.articlesService.remove(id);
   }
 }

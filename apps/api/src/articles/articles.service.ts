@@ -228,6 +228,7 @@ export class ArticlesService {
           select: {
             id: true,
             title: true,
+            slug: true,
             summary: true,
             content: true,
             categoryId: true,
@@ -267,7 +268,7 @@ export class ArticlesService {
           );
         }
 
-        const slug = createSlug(existingArticle.title);
+        const slug = existingArticle.slug ?? createSlug(existingArticle.title);
 
         if (!slug) {
           throw new BadRequestException(
@@ -329,6 +330,76 @@ export class ArticlesService {
         error.code === 'P2002'
       ) {
         throw new ConflictException('Another article already uses this slug');
+      }
+
+      throw error;
+    }
+  }
+
+  async unpublish(id: string) {
+    const existingArticle = await this.prisma.article.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        status: true,
+      },
+    });
+
+    if (!existingArticle) {
+      throw new NotFoundException('Article not found');
+    }
+
+    if (existingArticle.status === ArticleStatus.DRAFT) {
+      throw new ConflictException('Article is already a draft');
+    }
+
+    const article = await this.prisma.article.update({
+      where: { id },
+      data: {
+        status: ArticleStatus.DRAFT,
+        publishedAt: null,
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        summary: true,
+        content: true,
+        status: true,
+        publishedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        category: {
+          select: { id: true, name: true, slug: true },
+        },
+        tags: {
+          select: {
+            tag: {
+              select: { id: true, name: true, slug: true },
+            },
+          },
+          orderBy: { tag: { name: 'asc' } },
+        },
+      },
+    });
+
+    return {
+      ...article,
+      tags: article.tags.map(({ tag }) => tag),
+    };
+  }
+
+  async remove(id: string): Promise<void> {
+    try {
+      await this.prisma.article.delete({
+        where: { id },
+      });
+    } catch (error: unknown) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Article not found');
       }
 
       throw error;
