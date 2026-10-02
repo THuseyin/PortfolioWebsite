@@ -55,6 +55,7 @@
 
 .navigation-link,
 .navigation-status {
+  position: relative;
   display: grid;
   min-width: 0;
   padding-inline: clamp(0.7rem, 1.25vw, 1.4rem);
@@ -79,8 +80,14 @@
   background: var(--paper-raised);
 }
 
-.navigation-link.active {
-  box-shadow: inset 0 -2px var(--signal);
+.navigation-link__indicator {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--signal);
+  pointer-events: none;
 }
 
 .navigation-status {

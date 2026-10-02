@@ -31,17 +31,13 @@ export function SiteHeader() {
         </Link>
 
         <nav className="desktop-navigation" aria-label="Primary navigation">
-          <NavLink className="navigation-link" to="/articles">
-            All articles
-          </NavLink>
+          <DesktopNavigationLink label="All articles" to="/articles" />
           {categories.map((category) => (
-            <NavLink
-              className="navigation-link"
+            <DesktopNavigationLink
               key={category.id}
+              label={category.name}
               to={`/categories/${category.slug}`}
-            >
-              {category.name}
-            </NavLink>
+            />
           ))}
           {categoriesQuery.isError && (
             <span className="navigation-status">Categories unavailable</span>
@@ -105,6 +101,25 @@ export function SiteHeader() {
         )}
       </AnimatePresence>
     </header>
+  )
+}
+
+function DesktopNavigationLink({ label, to }: { label: string; to: string }) {
+  return (
+    <NavLink className="navigation-link" to={to}>
+      {({ isActive }) => (
+        <>
+          <span>{label}</span>
+          {isActive && (
+            <motion.span
+              className="navigation-link__indicator"
+              layoutId="desktop-navigation-indicator"
+              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+            />
+          )}
+        </>
+      )}
+    </NavLink>
   )
 }
 
