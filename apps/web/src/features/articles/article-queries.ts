@@ -22,6 +22,14 @@ export const articleQueries = {
           `/articles?category=${encodeURIComponent(category)}&page=${page}&limit=${limit}`,
         ),
     }),
+  byTag: (tag: string, page = 1, limit = 8) =>
+    queryOptions({
+      queryKey: ['articles', 'tag', tag, page, limit],
+      queryFn: () =>
+        apiRequest<PaginatedArticles>(
+          `/articles?tag=${encodeURIComponent(tag)}&page=${page}&limit=${limit}`,
+        ),
+    }),
   latest: (limit = 3) =>
     queryOptions({
       queryKey: ['articles', 'latest', limit],

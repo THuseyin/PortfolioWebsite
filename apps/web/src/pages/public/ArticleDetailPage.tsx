@@ -68,10 +68,12 @@ export function ArticleDetailPage() {
 
       <div className="article-detail__layout">
         <aside className="article-detail__aside">
-          <p className="eyebrow">Filed under</p>
+          <p className="eyebrow">Tags</p>
           <div className="article-detail__tags">
             {article.tags.length > 0
-              ? article.tags.map((tag) => <span key={tag.id}>#{tag.name}</span>)
+              ? article.tags.map((tag) => (
+                  <Link key={tag.id} to={`/tags/${tag.slug}`}>#{tag.name}</Link>
+                ))
               : <span>No tags</span>}
           </div>
         </aside>

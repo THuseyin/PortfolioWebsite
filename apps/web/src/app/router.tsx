@@ -9,6 +9,7 @@ import { ArticleDetailPage } from '../pages/public/ArticleDetailPage'
 import { ArticlesPage } from '../pages/public/ArticlesPage'
 import { CategoryArticlesPage } from '../pages/public/CategoryArticlesPage'
 import { HomePage } from '../pages/public/HomePage'
+import { TagArticlesPage } from '../pages/public/TagArticlesPage'
 import { NotFoundPage } from '../pages/shared/NotFoundPage'
 
 export const router = createBrowserRouter([
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
       { path: 'articles', element: <ArticlesPage /> },
       { path: 'articles/:slug', element: <ArticleDetailPage /> },
       { path: 'categories/:categorySlug', element: <CategoryArticlesPage /> },
+      { path: 'tags/:tagSlug', element: <TagArticlesPage /> },
     ],
   },
   {
