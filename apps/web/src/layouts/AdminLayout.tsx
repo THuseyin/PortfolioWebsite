@@ -28,7 +28,10 @@ export function AdminLayout() {
   return (
     <div className="admin-shell">
       <header className="admin-shell__header">
-        <NavLink className="admin-shell__identity" to="/admin">HT / Admin</NavLink>
+        <NavLink className="admin-shell__identity" to="/admin" aria-label="Admin dashboard">
+          <span className="admin-shell__mark" aria-hidden="true">HT</span>
+          <span className="admin-shell__identity-label">Admin</span>
+        </NavLink>
         <nav aria-label="Admin navigation">
           <NavLink to="/admin" end>Dashboard</NavLink>
           <NavLink to="/admin/homepage">Homepage</NavLink>

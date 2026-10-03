@@ -108,14 +108,17 @@
 @media (max-width: 58rem) {
   .admin-editor__grid { grid-template-columns: 1fr; }
   .admin-editor__sidebar { grid-row: 1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .admin-editor__header { top: var(--header-height); }
 }
 
 @media (max-width: 42rem) {
   .admin-editor__header { position: static; align-items: flex-start; flex-direction: column; }
-  .admin-editor__actions { width: 100%; }
+  .admin-editor__actions { width: 100%; flex-wrap: wrap; }
   .admin-editor__actions button { flex: 1; }
   .admin-editor__sidebar { grid-template-columns: 1fr; }
-  .admin-tiptap__toolbar { top: 0; }
+  .admin-tiptap__toolbar { position: sticky; top: var(--header-height); overflow-x: auto; flex-wrap: nowrap; scrollbar-width: thin; }
+  .admin-tiptap__toolbar button { flex: 0 0 2rem; }
+  .admin-tiptap__content { min-height: 26rem; padding: 1.25rem; }
   .admin-editor-preview { inset: 0; border: 0; }
   .admin-editor-preview__bar { min-height: 4rem; }
   .admin-editor-preview__viewport { padding-inline: 1rem; }

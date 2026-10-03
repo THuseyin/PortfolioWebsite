@@ -10,14 +10,15 @@
   text-transform: uppercase;
 }
 
-.admin-shell { min-height: 100vh; background: var(--paper); }
+.admin-shell { min-width: 0; min-height: 100vh; overflow-x: clip; background: var(--paper); }
 
 .admin-shell__header {
   position: sticky;
   z-index: 20;
   top: 0;
   display: grid;
-  min-height: var(--header-height);
+  width: 100%;
+  height: var(--header-height);
   padding-inline: var(--page-gutter);
   border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--paper) 94%, transparent);
@@ -27,10 +28,31 @@
 }
 
 .admin-shell__identity {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-style: italic;
+  display: inline-flex;
+  width: max-content;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
+
+.admin-shell__mark {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid currentColor;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-style: italic;
+  letter-spacing: normal;
+  place-items: center;
+  transform: rotate(-3deg);
+  transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.admin-shell__identity:hover .admin-shell__mark { color: var(--signal-contrast); background: var(--signal); transform: rotate(3deg); }
 
 .admin-shell__header nav { display: flex; height: 100%; }
 
@@ -68,11 +90,24 @@
 
 .admin-shell__header button:disabled { cursor: wait; opacity: 0.55; }
 .admin-shell__header button svg { width: 0.85rem; height: 0.85rem; }
-.admin-shell__content { padding: clamp(2rem, 5vw, 5rem) var(--page-gutter); }
+.admin-shell__content { min-width: 0; padding: clamp(2rem, 5vw, 5rem) var(--page-gutter); }
 
-@media (max-width: 40rem) {
+@media (max-width: 72rem) {
   .admin-shell__header { grid-template-columns: 1fr auto; }
-  .admin-shell__header nav { position: fixed; right: 0; bottom: 0; left: 0; height: 3.75rem; border-top: 1px solid var(--line); background: var(--paper); }
-  .admin-shell__header nav a { flex: 1; justify-content: center; }
-  .admin-shell__content { padding-bottom: 5.5rem; }
+  .admin-shell__header nav { position: fixed; z-index: 30; right: 0; bottom: 0; left: 0; height: calc(3.75rem + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 96%, transparent); backdrop-filter: blur(14px); }
+  .admin-shell__header nav a { min-width: 0; padding-inline: 0.6rem; flex: 1; justify-content: center; text-align: center; }
+  .admin-shell__header nav a:first-child { border-left: 0; }
+  .admin-shell__header nav a:last-child { border-right: 0; }
+  .admin-shell__content { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 34rem) {
+  .admin-shell__identity-label { display: none; }
+  .admin-shell__header button { gap: 0.35rem; }
+  .admin-shell__header nav a { padding-inline: 0.25rem; font-size: 0.53rem; letter-spacing: 0.03em; }
+}
+
+@media (max-width: 25rem) {
+  .admin-shell__header button svg { width: 1rem; height: 1rem; }
+  .admin-shell__header button { font-size: 0; }
 }

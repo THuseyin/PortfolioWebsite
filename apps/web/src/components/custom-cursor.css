@@ -1,0 +1,32 @@
+.custom-cursor { display: none; }
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .custom-cursor-enabled,
+  .custom-cursor-enabled body,
+  .custom-cursor-enabled a,
+  .custom-cursor-enabled button,
+  .custom-cursor-enabled select,
+  .custom-cursor-enabled label,
+  .custom-cursor-enabled [role='button'] { cursor: none; }
+
+  .custom-cursor-enabled input,
+  .custom-cursor-enabled textarea,
+  .custom-cursor-enabled [contenteditable='true'] { cursor: text; }
+
+  .custom-cursor { position: fixed; z-index: 9999; inset: 0; display: block; pointer-events: none; }
+
+  .custom-cursor__dot,
+  .custom-cursor__ring { position: absolute; top: 0; left: 0; border-radius: 50%; opacity: 0; pointer-events: none; will-change: transform; }
+
+  .custom-cursor__dot { width: 0.35rem; height: 0.35rem; margin: -0.175rem 0 0 -0.175rem; background: var(--signal); transition: width 160ms ease, height 160ms ease, margin 160ms ease, opacity 140ms ease; }
+
+  .custom-cursor__ring { width: 2rem; height: 2rem; margin: -1rem 0 0 -1rem; border: 1px solid color-mix(in srgb, var(--signal) 72%, transparent); background: color-mix(in srgb, var(--signal) 4%, transparent); transition: width 240ms cubic-bezier(0.22, 1, 0.36, 1), height 240ms cubic-bezier(0.22, 1, 0.36, 1), margin 240ms cubic-bezier(0.22, 1, 0.36, 1), background 240ms ease, opacity 140ms ease; }
+
+  .custom-cursor__dot.is-visible,
+  .custom-cursor__ring.is-visible { opacity: 1; }
+
+  .custom-cursor__ring.is-interactive { width: 3.25rem; height: 3.25rem; margin: -1.625rem 0 0 -1.625rem; background: color-mix(in srgb, var(--signal) 13%, transparent); }
+  .custom-cursor__ring.is-pressed { width: 1.55rem; height: 1.55rem; margin: -0.775rem 0 0 -0.775rem; background: color-mix(in srgb, var(--signal) 24%, transparent); }
+  .custom-cursor__dot.is-hidden,
+  .custom-cursor__ring.is-hidden { opacity: 0; }
+}
