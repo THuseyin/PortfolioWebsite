@@ -149,12 +149,18 @@
 .collage-track figure {
   width: auto;
   height: 100%;
-  aspect-ratio: var(--image-ratio, 4 / 3);
   flex: 0 0 auto;
   margin: 0;
   overflow: hidden;
   background: var(--line);
-  transition: aspect-ratio 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.collage-frame--wide {
+  aspect-ratio: var(--landscape-ratio, 16 / 10);
+}
+
+.collage-frame--square {
+  aspect-ratio: 1;
 }
 
 .collage-track img {
@@ -564,13 +570,13 @@
 
 @keyframes collage-left {
   to {
-    transform: translateX(calc(-50% - 0.5rem));
+    transform: translateX(calc(-25% - 0.25rem));
   }
 }
 
 @keyframes collage-right {
   from {
-    transform: translateX(calc(-50% - 0.5rem));
+    transform: translateX(calc(-25% - 0.25rem));
   }
   to {
     transform: translateX(0);

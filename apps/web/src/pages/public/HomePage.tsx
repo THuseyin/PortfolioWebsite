@@ -171,29 +171,31 @@ function HomeChrome({ activeSection }: { activeSection: number }) {
 function Collage({ images }: { images: string[] }) {
   const collageRows = [images.slice(0, 4), images.slice(4, 8), images.slice(8, 12)]
 
-  const adaptImageRatio = (image: HTMLImageElement) => {
+  const preserveLandscapeRatio = (image: HTMLImageElement) => {
+    if (image.naturalHeight === 0 || image.naturalWidth <= image.naturalHeight) return
+
     const figure = image.parentElement
-
-    if (!figure || image.naturalHeight === 0) return
-
-    const naturalRatio = image.naturalWidth / image.naturalHeight
-    const displayRatio = Math.min(2.4, Math.max(0.6, naturalRatio))
-    figure.style.setProperty('--image-ratio', String(displayRatio))
+    const landscapeRatio = Math.min(2.4, image.naturalWidth / image.naturalHeight)
+    figure?.style.setProperty('--landscape-ratio', String(landscapeRatio))
+    figure?.classList.replace('collage-frame--square', 'collage-frame--wide')
   }
 
   return (
     <div className="hero-collage" aria-hidden="true">
       {collageRows.map((row, rowIndex) => {
-        const repeatedRow = [...row, ...row]
+        const repeatedRow = [...row, ...row, ...row, ...row]
         return (
           <div className={`collage-row collage-row--${rowIndex + 1}`} key={rowIndex}>
             <div className="collage-track">
               {repeatedRow.map((imageUrl, imageIndex) => (
-                <figure key={`${imageUrl}-${imageIndex}`}>
+                <figure
+                  className="collage-frame--square"
+                  key={`${imageUrl}-${imageIndex}`}
+                >
                   <img
                     src={imageUrl}
                     alt=""
-                    onLoad={(event) => adaptImageRatio(event.currentTarget)}
+                    onLoad={(event) => preserveLandscapeRatio(event.currentTarget)}
                   />
                 </figure>
               ))}
