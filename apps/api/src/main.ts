@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import connectPgSimple from 'connect-pg-simple';
+import type { NextFunction, Request, Response } from 'express';
 import session from 'express-session';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -67,7 +68,7 @@ async function bootstrap() {
 
   if (existsSync(webDistPath)) {
     app.useStaticAssets(webDistPath, { index: false });
-    app.use((request, response, next) => {
+    app.use((request: Request, response: Response, next: NextFunction) => {
       if (
         request.method !== 'GET' ||
         request.path.startsWith('/api') ||

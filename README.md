@@ -9,7 +9,7 @@ A personal portfolio and editorial archive with a public reading experience and 
 - NestJS REST API
 - Prisma and PostgreSQL
 - Cookie-based admin sessions stored in PostgreSQL
-- Local image uploads under `uploads/images`
+- Pluggable local or Supabase Storage image uploads
 
 ## Requirements
 
@@ -57,6 +57,11 @@ WEB_ORIGIN=http://localhost:5173
 SESSION_SECRET=replace-with-a-long-random-secret
 ADMIN_USERNAME=replace-with-admin-username
 ADMIN_PASSWORD_HASH=replace-with-password-hash
+
+MEDIA_STORAGE_DRIVER=local
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_MEDIA_BUCKET=portfolio-media
 ```
 
 Generate a bcrypt hash for the admin password:
@@ -175,12 +180,23 @@ In production:
 - set `NODE_ENV=production` so session cookies use the secure flag;
 - set `WEB_ORIGIN` to the exact public web origin;
 - use a strong `SESSION_SECRET`;
-- keep PostgreSQL and `uploads/images` on persistent storage;
+- configure Supabase Storage for image persistence, or keep `uploads/images` on persistent storage when using the local driver;
 - apply migrations with `pnpm --filter api exec prisma migrate deploy` before starting the API.
 
 ## Media storage
 
-Admin image uploads are stored locally in `uploads/images` and served from `/api/media/images/:filename`. The directory is intentionally ignored by Git. Back it up or mount persistent storage if the application is deployed beyond local development.
+Local development uses `MEDIA_STORAGE_DRIVER=local`. Images are written to `uploads/images` and served from `/api/media/images/:filename`. The directory is intentionally ignored by Git.
+
+For deployment, create a **public** Supabase Storage bucket and configure:
+
+```dotenv
+MEDIA_STORAGE_DRIVER=supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_MEDIA_BUCKET=portfolio-media
+```
+
+The service-role key is used only by the API and must never be exposed to the browser or committed to Git. Uploaded objects are placed under the bucket's `images/` directory, and the API returns their public Supabase URL. Existing local image URLs remain readable while the application is running with local storage; changing providers does not migrate previously uploaded files.
 
 ## Workspace structure
 

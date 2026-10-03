@@ -11,13 +11,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { AdminAuthGuard } from '../auth/guards/admin-auth.guard.js';
+import type { UploadedImage } from './media-storage.js';
 import { MediaService } from './media.service.js';
-
-interface UploadedImage {
-  buffer: Buffer;
-  mimetype: string;
-  size: number;
-}
 
 @Controller('admin/media')
 @UseGuards(AdminAuthGuard)
