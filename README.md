@@ -161,7 +161,16 @@ Start the compiled API:
 pnpm --filter api start:prod
 ```
 
-The web output is written to `apps/web/dist`. Serve that directory with a static host and proxy `/api` to the NestJS application. In production:
+The web output is written to `apps/web/dist`. The compiled NestJS application serves this directory automatically, so the public site, admin interface, and API can run from one process and one origin:
+
+```text
+/                 React application
+/articles/*       React application
+/admin/*          React application
+/api/*            NestJS API
+```
+
+In production:
 
 - set `NODE_ENV=production` so session cookies use the secure flag;
 - set `WEB_ORIGIN` to the exact public web origin;

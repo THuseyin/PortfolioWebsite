@@ -1,13 +1,16 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import connectPgSimple from 'connect-pg-simple';
 import session from 'express-session';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
   const isProduction =
@@ -57,6 +60,26 @@ async function bootstrap() {
   );
 
   app.setGlobalPrefix('api');
+
+  const webDistPath = fileURLToPath(
+    new URL('../../web/dist', import.meta.url),
+  );
+
+  if (existsSync(webDistPath)) {
+    app.useStaticAssets(webDistPath, { index: false });
+    app.use((request, response, next) => {
+      if (
+        request.method !== 'GET' ||
+        request.path.startsWith('/api') ||
+        request.path.includes('.')
+      ) {
+        next();
+        return;
+      }
+
+      response.sendFile(`${webDistPath}/index.html`);
+    });
+  }
 
   app.useGlobalPipes(
     new ValidationPipe({
