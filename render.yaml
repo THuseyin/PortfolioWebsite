@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    buildCommand: pnpm install --frozen-lockfile && pnpm build
     startCommand: pnpm --filter api exec prisma migrate deploy && pnpm --filter api start:prod
     healthCheckPath: /api
     autoDeployTrigger: commit
