@@ -122,6 +122,11 @@
 .article-prose__image { margin: 2.5rem 0; }
 .article-prose__image img { display: block; width: 100%; height: auto; }
 .article-prose__image figcaption { margin-top: 0.65rem; color: var(--muted); font-family: var(--font-mono); font-size: 0.625rem; letter-spacing: 0.04em; }
+.article-prose__image--left,
+.article-prose__image--right { width: min(50%, 22rem); }
+.article-prose__image--left { margin-right: auto; }
+.article-prose__image--right { margin-left: auto; }
+.article-prose__image--center { width: min(72%, 34rem); margin-inline: auto; }
 
 .article-detail__footer {
   display: flex;
@@ -159,5 +164,8 @@
   .article-detail__meta { flex-direction: row; padding-top: 0; justify-content: space-between; }
   .article-detail__hero { aspect-ratio: 4 / 3; }
   .article-detail__aside { position: static; }
+  .article-prose__image--left,
+  .article-prose__image--right,
+  .article-prose__image--center { width: 100%; }
   .article-detail__footer { align-items: flex-start; flex-direction: column; gap: 1.25rem; }
 }

@@ -1,11 +1,13 @@
 import Image from '@tiptap/extension-image'
 import { EditorContent, useEditor, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import * as Dialog from '@radix-ui/react-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Bold, Code2, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, Quote, Redo2, Save, Undo2, Unlink } from 'lucide-react'
-import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from 'react'
+import { AlignCenter, AlignLeft, AlignRight, ArrowLeft, Bold, Code2, Eye, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Maximize2, Quote, Redo2, Save, Undo2, Unlink, X } from 'lucide-react'
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useBlocker, useNavigate, useParams } from 'react-router'
 
+import { TiptapContent } from '../../components/public/TiptapContent'
 import {
   adminArticleQueries,
   createAdminArticle,
@@ -19,9 +21,23 @@ import {
 import { categoryQueries } from '../../features/categories/category-queries'
 import { tagQueries } from '../../features/tags/tag-queries'
 import { ApiError } from '../../lib/api-client'
+import type { TiptapNode } from '../../types/article'
 import './admin-article-editor-page.css'
+import '../public/article-detail-page.css'
 
 const emptyDocument = { type: 'doc', content: [{ type: 'paragraph' }] }
+const AlignedImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      alignment: {
+        default: 'wide',
+        parseHTML: (element) => element.getAttribute('data-alignment') ?? 'wide',
+        renderHTML: (attributes) => ({ 'data-alignment': attributes.alignment }),
+      },
+    }
+  },
+})
 
 export function AdminArticleEditorPage() {
   const { articleId } = useParams()
@@ -61,6 +77,7 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
   const [tagIds, setTagIds] = useState<string[]>([])
   const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(null)
   const [dirty, setDirty] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'error' | 'success'; message: string } | null>(null)
   const initializedArticleId = useRef<string | null>(null)
   const headerInputRef = useRef<HTMLInputElement>(null)
@@ -68,7 +85,7 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
 
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: [StarterKit.configure({ link: { openOnClick: false } }), Image.configure({ allowBase64: false })],
+    extensions: [StarterKit.configure({ link: { openOnClick: false } }), AlignedImage.configure({ allowBase64: false })],
     content: emptyDocument,
     editorProps: { attributes: { class: 'admin-tiptap__content', 'aria-label': 'Article content' } },
     onUpdate: () => setDirty(true),
@@ -217,6 +234,7 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
           <p className="eyebrow">{article.status} / {dirty ? 'Unsaved changes' : 'Up to date'}</p>
         </div>
         <div className="admin-editor__actions">
+          <button type="button" disabled={busy} onClick={() => setPreviewOpen(true)}><Eye aria-hidden="true" /> Preview</button>
           <button type="button" disabled={busy} onClick={() => save()}><Save aria-hidden="true" /> Save draft</button>
           {article.status === 'DRAFT' ? (
             <button className="admin-editor__publish" type="button" disabled={busy} onClick={handlePublish}>Publish</button>
@@ -285,21 +303,40 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
 
       <input ref={headerInputRef} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => handleFile(event, 'header')} />
       <input ref={inlineInputRef} className="sr-only" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => handleFile(event, 'inline')} />
+      <ArticlePreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        title={title.trim() || 'Untitled'}
+        summary={summary.trim()}
+        headerImageUrl={headerImageUrl}
+        category={categoriesQuery.data?.find((category) => category.id === categoryId)?.name}
+        tags={tagsQuery.data?.filter((tag) => tagIds.includes(tag.id)).map((tag) => tag.name) ?? []}
+        document={editor.getJSON() as TiptapNode}
+      />
     </main>
   )
 }
 
 function EditorToolbar({ editor, imageBusy, onImage }: { editor: Editor; imageBusy: boolean; onImage: () => void }) {
-  const setLink = () => {
-    const previous = editor.getAttributes('link').href as string | undefined
-    const href = window.prompt('Link URL', previous ?? 'https://')
-    if (href === null) return
-    if (!href.trim()) {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run()
-      return
-    }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: href.trim() }).run()
+  const [linkOpen, setLinkOpen] = useState(false)
+  const [href, setHref] = useState('https://')
+
+  const openLinkEditor = () => {
+    setHref((editor.getAttributes('link').href as string | undefined) ?? 'https://')
+    setLinkOpen(true)
   }
+
+  const setLink = (event: FormEvent) => {
+    event.preventDefault()
+    const value = href.trim()
+    if (!value) editor.chain().focus().extendMarkRange('link').unsetLink().run()
+    else editor.chain().focus().extendMarkRange('link').setLink({ href: value }).run()
+    setLinkOpen(false)
+  }
+
+  const imageSelected = editor.isActive('image')
+  const alignImage = (alignment: 'left' | 'center' | 'right' | 'wide') =>
+    editor.chain().focus().updateAttributes('image', { alignment }).run()
 
   return (
     <div className="admin-tiptap__toolbar" aria-label="Formatting toolbar">
@@ -307,16 +344,67 @@ function EditorToolbar({ editor, imageBusy, onImage }: { editor: Editor; imageBu
       <ToolbarButton label="Redo" onClick={() => editor.chain().focus().redo().run()}><Redo2 /></ToolbarButton>
       <span />
       <ToolbarButton active={editor.isActive('heading', { level: 2 })} label="Heading" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}><Heading2 /></ToolbarButton>
+      <ToolbarButton active={editor.isActive('heading', { level: 3 })} label="Subheading" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}><Heading3 /></ToolbarButton>
       <ToolbarButton active={editor.isActive('bold')} label="Bold" onClick={() => editor.chain().focus().toggleBold().run()}><Bold /></ToolbarButton>
       <ToolbarButton active={editor.isActive('italic')} label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()}><Italic /></ToolbarButton>
       <ToolbarButton active={editor.isActive('code')} label="Inline code" onClick={() => editor.chain().focus().toggleCode().run()}><Code2 /></ToolbarButton>
       <ToolbarButton active={editor.isActive('bulletList')} label="Bullet list" onClick={() => editor.chain().focus().toggleBulletList().run()}><List /></ToolbarButton>
       <ToolbarButton active={editor.isActive('orderedList')} label="Ordered list" onClick={() => editor.chain().focus().toggleOrderedList().run()}><ListOrdered /></ToolbarButton>
       <ToolbarButton active={editor.isActive('blockquote')} label="Quote" onClick={() => editor.chain().focus().toggleBlockquote().run()}><Quote /></ToolbarButton>
-      <ToolbarButton active={editor.isActive('link')} label="Link" onClick={setLink}><Link2 /></ToolbarButton>
+      <ToolbarButton active={editor.isActive('link')} label="Link" onClick={openLinkEditor}><Link2 /></ToolbarButton>
       <ToolbarButton label="Remove link" onClick={() => editor.chain().focus().unsetLink().run()}><Unlink /></ToolbarButton>
+      <span />
       <ToolbarButton disabled={imageBusy} label="Insert image" onClick={onImage}><ImagePlus /></ToolbarButton>
+      <ToolbarButton active={imageSelected && editor.getAttributes('image').alignment === 'left'} disabled={!imageSelected} label="Align image left" onClick={() => alignImage('left')}><AlignLeft /></ToolbarButton>
+      <ToolbarButton active={imageSelected && editor.getAttributes('image').alignment === 'center'} disabled={!imageSelected} label="Center image" onClick={() => alignImage('center')}><AlignCenter /></ToolbarButton>
+      <ToolbarButton active={imageSelected && editor.getAttributes('image').alignment === 'right'} disabled={!imageSelected} label="Align image right" onClick={() => alignImage('right')}><AlignRight /></ToolbarButton>
+      <ToolbarButton active={imageSelected && editor.getAttributes('image').alignment === 'wide'} disabled={!imageSelected} label="Full-width image" onClick={() => alignImage('wide')}><Maximize2 /></ToolbarButton>
+
+      <Dialog.Root open={linkOpen} onOpenChange={setLinkOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="admin-editor-dialog__overlay" />
+          <Dialog.Content className="admin-editor-link-dialog">
+            <div><span className="eyebrow">Inline link</span><Dialog.Close aria-label="Close link editor"><X aria-hidden="true" /></Dialog.Close></div>
+            <Dialog.Title>Add or edit link</Dialog.Title>
+            <Dialog.Description>Select text before opening this dialog. Relative paths, anchors, mailto and HTTPS links are supported.</Dialog.Description>
+            <form onSubmit={setLink}>
+              <label><span>URL</span><input autoFocus required value={href} onChange={(event) => setHref(event.target.value)} /></label>
+              <div><Dialog.Close>Cancel</Dialog.Close><button type="submit">Apply link</button></div>
+            </form>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
+  )
+}
+
+function ArticlePreviewDialog({ open, onOpenChange, title, summary, headerImageUrl, category, tags, document }: { open: boolean; onOpenChange: (open: boolean) => void; title: string; summary: string; headerImageUrl: string | null; category?: string; tags: string[]; document: TiptapNode }) {
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="admin-editor-dialog__overlay" />
+        <Dialog.Content className="admin-editor-preview">
+          <div className="admin-editor-preview__bar">
+            <div><span className="eyebrow">Draft preview</span><small>Unsaved changes included</small></div>
+            <Dialog.Close aria-label="Close preview"><X aria-hidden="true" /> Close</Dialog.Close>
+          </div>
+          <div className="admin-editor-preview__viewport">
+            <article className="article-detail">
+              <header className="article-detail__header">
+                <div className="article-detail__meta"><span>{category ?? 'Uncategorized'}</span><span>Preview</span></div>
+                <h1>{title}</h1>
+                {summary && <p className="article-detail__summary">{summary}</p>}
+              </header>
+              {headerImageUrl && <figure className="article-detail__hero"><img src={headerImageUrl} alt={`Header visual for ${title}`} /></figure>}
+              <div className="article-detail__layout">
+                <aside className="article-detail__aside"><p className="eyebrow">Tags</p><div className="article-detail__tags">{tags.length ? tags.map((tag) => <span key={tag}>#{tag}</span>) : <span>No tags</span>}</div></aside>
+                <div className="article-prose"><TiptapContent document={document} /></div>
+              </div>
+            </article>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 
