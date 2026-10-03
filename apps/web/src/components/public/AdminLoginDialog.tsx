@@ -3,12 +3,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowUpRight, X } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 import { authQueries, loginAdmin } from '../../features/auth/auth-api'
 import { ApiError } from '../../lib/api-client'
 import './admin-login-dialog.css'
 
 export function AdminLoginDialog() {
+  const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
   const [open, setOpen] = useState(searchParams.get('admin') === 'login')
   const [formError, setFormError] = useState<string | null>(null)
@@ -36,7 +38,7 @@ export function AdminLoginDialog() {
     const password = String(formData.get('password') ?? '')
 
     if (!username || !password) {
-      setFormError('Enter both your username and password.')
+      setFormError(t('login.missing'))
       return
     }
 
@@ -46,7 +48,7 @@ export function AdminLoginDialog() {
 
       const adminWindow = window.open('/admin', '_blank')
       if (!adminWindow) {
-        setFormError('Login succeeded. Allow pop-ups for this site to open the admin workspace.')
+        setFormError(t('login.popup'))
         return
       }
       adminWindow.opener = null
@@ -56,8 +58,8 @@ export function AdminLoginDialog() {
     } catch (error) {
       setFormError(
         error instanceof ApiError && error.status === 401
-          ? 'The username or password is incorrect.'
-          : 'Admin login is unavailable. Please try again.',
+          ? t('login.incorrect')
+          : t('login.unavailable'),
       )
     }
   }
@@ -66,7 +68,7 @@ export function AdminLoginDialog() {
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>
         <button className="admin-trigger" type="button">
-          Admin
+          {t('login.trigger')}
           <ArrowUpRight aria-hidden="true" />
         </button>
       </Dialog.Trigger>
@@ -75,28 +77,28 @@ export function AdminLoginDialog() {
         <Dialog.Content className="login-dialog">
           <div className="login-dialog__heading">
             <div>
-              <p className="eyebrow">Restricted / 01</p>
-              <Dialog.Title>Admin access</Dialog.Title>
+              <p className="eyebrow">{t('login.eyebrow')}</p>
+              <Dialog.Title>{t('login.title')}</Dialog.Title>
             </div>
-            <Dialog.Close className="dialog-close" aria-label="Close login dialog">
+            <Dialog.Close className="dialog-close" aria-label={t('login.close')}>
               <X aria-hidden="true" />
             </Dialog.Close>
           </div>
           <Dialog.Description>
-            Enter your private credentials to open the publishing workspace.
+            {t('login.description')}
           </Dialog.Description>
           <form className="login-form" onSubmit={handleSubmit}>
             <label>
-              <span>Username</span>
+              <span>{t('login.username')}</span>
               <input name="username" autoComplete="username" disabled={loginMutation.isPending} />
             </label>
             <label>
-              <span>Password</span>
+              <span>{t('login.password')}</span>
               <input name="password" type="password" autoComplete="current-password" disabled={loginMutation.isPending} />
             </label>
             {formError && <p className="login-form__error" role="alert">{formError}</p>}
             <button type="submit" disabled={loginMutation.isPending}>
-              {loginMutation.isPending ? 'Checking…' : 'Continue'}
+              {loginMutation.isPending ? t('login.checking') : t('login.continue')}
             </button>
           </form>
         </Dialog.Content>

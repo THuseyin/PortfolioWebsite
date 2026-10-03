@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 import { ArticleArchive } from '../../components/public/ArticleArchive'
 import { PageMeta } from '../../components/PageMeta'
@@ -9,6 +10,7 @@ import './articles-page.css'
 const pageSize = 8
 
 export function ArticlesPage() {
+  const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedPage = Number(searchParams.get('page') ?? '1')
   const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1
@@ -23,17 +25,17 @@ export function ArticlesPage() {
 
   return (
     <div className="archive-page">
-      <PageMeta title="All Articles" description="Writing about software, systems, interfaces, and ongoing experiments." />
+      <PageMeta title={t('archive.title')} description={t('archive.description')} />
       <header className="archive-hero">
-        <h1>All Articles</h1>
+        <h1>{t('archive.title')}</h1>
         <span className="archive-hero__count">
-          {pagination ? String(pagination.totalItems).padStart(2, '0') : '—'} notes
+          {pagination ? String(pagination.totalItems).padStart(2, '0') : '—'} {t('archive.notes')}
         </span>
       </header>
 
       <ArticleArchive
         articles={articles}
-        errorMessage="The notes could not be loaded. Check that the API is running and try again."
+        errorMessage={t('archive.loadError')}
         isError={articlesQuery.isError}
         isPending={articlesQuery.isPending}
         onRetry={() => articlesQuery.refetch()}

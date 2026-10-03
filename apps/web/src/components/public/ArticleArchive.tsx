@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 import type { ArticleSummary, PaginatedArticles } from '../../types/article'
 
@@ -24,15 +25,16 @@ export function ArticleArchive({
   page,
   pagination,
 }: ArticleArchiveProps) {
+  const { t } = useTranslation()
   return (
     <>
-      <section className="archive-list" aria-label="Article archive">
+      <section className="archive-list" aria-label={t('archive.label')}>
         {isPending && <ArchiveLoading />}
-        {isError && <ArchiveMessage title="The archive is offline" message={errorMessage} onRetry={onRetry} />}
+        {isError && <ArchiveMessage title={t('archive.offlineTitle')} message={errorMessage} onRetry={onRetry} />}
         {!isPending && !isError && articles.length === 0 && (
           <ArchiveMessage
-            title="No published notes yet"
-            message="New writing will appear here once it is published."
+            title={t('archive.emptyTitle')}
+            message={t('archive.emptyMessage')}
           />
         )}
         {articles.map((article, index) => (
@@ -45,13 +47,13 @@ export function ArticleArchive({
       </section>
 
       {pagination && pagination.totalPages > 1 && (
-        <nav className="archive-pagination" aria-label="Archive pagination">
+        <nav className="archive-pagination" aria-label={t('archive.pagination')}>
           <button
             type="button"
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
           >
-            <ArrowLeft aria-hidden="true" /> Previous
+            <ArrowLeft aria-hidden="true" /> {t('archive.previous')}
           </button>
           <span>
             {String(page).padStart(2, '0')} / {String(pagination.totalPages).padStart(2, '0')}
@@ -61,7 +63,7 @@ export function ArticleArchive({
             disabled={page >= pagination.totalPages}
             onClick={() => onPageChange(page + 1)}
           >
-            Next <ArrowRight aria-hidden="true" />
+            {t('archive.next')} <ArrowRight aria-hidden="true" />
           </button>
         </nav>
       )}
@@ -70,7 +72,9 @@ export function ArticleArchive({
 }
 
 function ArticleArchiveCard({ article, index }: { article: ArticleSummary; index: number }) {
-  const date = new Intl.DateTimeFormat('en-GB', {
+  const { i18n, t } = useTranslation()
+  const locale = i18n.resolvedLanguage?.startsWith('tr') ? 'tr-TR' : i18n.resolvedLanguage?.startsWith('de') ? 'de-DE' : 'en-GB'
+  const date = new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -84,13 +88,13 @@ function ArticleArchiveCard({ article, index }: { article: ArticleSummary; index
             article.headerImageUrl ??
             `/images/home-collage/collage-${String(((index - 1) % 12) + 1).padStart(2, '0')}.jpg`
           }
-          alt={`Header visual for ${article.title}`}
+          alt={t('article.imageAlt', { title: article.title })}
         />
         <span>{String(index).padStart(2, '0')}</span>
       </div>
       <span className="archive-row__content">
         <span className="archive-row__meta">
-          <span>{article.category?.name ?? 'Uncategorized'}</span>
+          <span>{article.category?.name ?? t('archive.uncategorized')}</span>
           <time dateTime={article.publishedAt}>{date}</time>
         </span>
         <strong>{article.title}</strong>
@@ -102,20 +106,22 @@ function ArticleArchiveCard({ article, index }: { article: ArticleSummary; index
 }
 
 function ArchiveLoading() {
+  const { t } = useTranslation()
   return (
-    <div className="archive-loading" aria-label="Loading articles">
+    <div className="archive-loading" aria-label={t('archive.loading')}>
       {Array.from({ length: 4 }, (_, index) => <span key={index} />)}
     </div>
   )
 }
 
 function ArchiveMessage({ title, message, onRetry }: { title: string; message: string; onRetry?: () => void }) {
+  const { t } = useTranslation()
   return (
     <div className="archive-message">
-      <p className="eyebrow">Archive status</p>
+      <p className="eyebrow">{t('archive.status')}</p>
       <h2>{title}</h2>
       <p>{message}</p>
-      {onRetry && <button type="button" onClick={onRetry}>Try again</button>}
+      {onRetry && <button type="button" onClick={onRetry}>{t('archive.retry')}</button>}
     </div>
   )
 }

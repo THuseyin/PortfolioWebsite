@@ -1,9 +1,11 @@
 import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 import './site-footer.css'
 
 export function SiteFooter() {
+  const { t } = useTranslation()
   const currentYear = new Date().getFullYear()
 
   return (
@@ -11,11 +13,11 @@ export function SiteFooter() {
       <div className="site-footer__meta">
         <span>© {currentYear}</span>
         <Link to="/articles">
-          Browse the archive
+          {t('footer.browse')}
           <ArrowUpRight aria-hidden="true" />
         </Link>
         <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          Back to top ↑
+          {t('footer.top')} ↑
         </button>
       </div>
     </footer>

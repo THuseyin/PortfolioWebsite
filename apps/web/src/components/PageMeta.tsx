@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const siteName = 'Hüseyin Tepe'
-const defaultDescription = 'Personal archive of software, writing, travel, and digital experiments.'
 
 type PageMetaProps = {
   title?: string
@@ -11,9 +11,10 @@ type PageMetaProps = {
 }
 
 export function PageMeta({ title, description, image, type = 'website' }: PageMetaProps) {
+  const { t, i18n } = useTranslation()
   useEffect(() => {
-    const pageTitle = title ? `${title} — ${siteName}` : `${siteName} — Notes & Experiments`
-    const pageDescription = description?.trim() || defaultDescription
+    const pageTitle = title ? `${title} — ${siteName}` : `${siteName} — ${t('meta.defaultTitle')}`
+    const pageDescription = description?.trim() || t('meta.defaultDescription')
     const imageUrl = new URL(image || '/images/brand/social-card.png', window.location.origin).href
     const canonicalUrl = `${window.location.origin}${window.location.pathname}`
 
@@ -30,7 +31,7 @@ export function PageMeta({ title, description, image, type = 'website' }: PageMe
     setMeta('name', 'twitter:description', pageDescription)
     setMeta('name', 'twitter:image', imageUrl)
     setCanonical(canonicalUrl)
-  }, [description, image, title, type])
+  }, [description, i18n.resolvedLanguage, image, t, title, type])
 
   return null
 }

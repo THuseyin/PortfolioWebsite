@@ -3,12 +3,15 @@ import { Menu, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 import { categoryQueries } from '../../features/categories/category-queries'
 import { AdminLoginDialog } from './AdminLoginDialog'
+import { LanguageSwitcher } from './LanguageSwitcher'
 import './site-header.css'
 
 export function SiteHeader() {
+  const { t } = useTranslation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const categoriesQuery = useQuery(categoryQueries.all())
   const categories = categoriesQuery.data ?? []
@@ -24,14 +27,14 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="site-header__bar">
-        <Link className="site-identity" to="/" aria-label="Go to home page">
+        <Link className="site-identity" to="/" aria-label={t('navigation.home')}>
           <span className="site-identity__mark" aria-hidden="true">
             HT
           </span>
         </Link>
 
-        <nav className="desktop-navigation" aria-label="Primary navigation">
-          <DesktopNavigationLink label="All articles" to="/articles" />
+        <nav className="desktop-navigation" aria-label={t('navigation.primary')}>
+          <DesktopNavigationLink label={t('navigation.allArticles')} to="/articles" />
           {categories.map((category) => (
             <DesktopNavigationLink
               key={category.id}
@@ -40,18 +43,19 @@ export function SiteHeader() {
             />
           ))}
           {categoriesQuery.isError && (
-            <span className="navigation-status">Categories unavailable</span>
+            <span className="navigation-status">{t('navigation.unavailable')}</span>
           )}
         </nav>
 
         <div className="site-header__actions">
+          <LanguageSwitcher />
           <AdminLoginDialog />
           <button
             className="menu-toggle"
             type="button"
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navigation"
-            aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}
+            aria-label={mobileMenuOpen ? t('navigation.close') : t('navigation.open')}
             onClick={() => setMobileMenuOpen((isOpen) => !isOpen)}
           >
             {mobileMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
@@ -64,7 +68,7 @@ export function SiteHeader() {
           <motion.nav
             id="mobile-navigation"
             className="mobile-navigation"
-            aria-label="Mobile navigation"
+            aria-label={t('navigation.mobile')}
             initial={{ clipPath: 'inset(0 0 100% 0)' }}
             animate={{ clipPath: 'inset(0 0 0% 0)' }}
             exit={{ clipPath: 'inset(0 0 100% 0)' }}
@@ -72,18 +76,18 @@ export function SiteHeader() {
           >
             <div className="mobile-navigation__index">
               <span className="eyebrow">Index / 01</span>
-              <span className="eyebrow">Navigation</span>
+              <span className="eyebrow">{t('navigation.index')}</span>
             </div>
             <div className="mobile-navigation__links">
               <MobileNavigationLink
                 index="01"
-                label="Home"
+                label={t('navigation.home')}
                 to="/"
                 onNavigate={() => setMobileMenuOpen(false)}
               />
               <MobileNavigationLink
                 index="02"
-                label="All articles"
+                label={t('navigation.allArticles')}
                 to="/articles"
                 onNavigate={() => setMobileMenuOpen(false)}
               />

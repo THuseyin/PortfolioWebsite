@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Navigate, useParams, useSearchParams } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 import { ArticleArchive } from '../../components/public/ArticleArchive'
 import { PageMeta } from '../../components/PageMeta'
@@ -10,6 +11,7 @@ import './articles-page.css'
 const pageSize = 8
 
 export function CategoryArticlesPage() {
+  const { t } = useTranslation()
   const { categorySlug } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedPage = Number(searchParams.get('page') ?? '1')
@@ -36,17 +38,17 @@ export function CategoryArticlesPage() {
 
   return (
     <div className="archive-page archive-page--category">
-      <PageMeta title={categoryName} description={`Articles filed under ${categoryName}.`} />
+      <PageMeta title={categoryName} description={t('archive.categoryDescription', { name: categoryName })} />
       <header className="archive-hero">
         <h1>{categoryName}</h1>
         <span className="archive-hero__count">
-          {pagination ? String(pagination.totalItems).padStart(2, '0') : '—'} notes
+          {pagination ? String(pagination.totalItems).padStart(2, '0') : '—'} {t('archive.notes')}
         </span>
       </header>
 
       <ArticleArchive
         articles={articles}
-        errorMessage={`The ${categoryName} notes could not be loaded. Please try again.`}
+        errorMessage={t('archive.filteredError', { name: categoryName })}
         isError={articlesQuery.isError || categoriesQuery.isError}
         isPending={articlesQuery.isPending || categoriesQuery.isPending}
         onRetry={() => { articlesQuery.refetch(); categoriesQuery.refetch() }}

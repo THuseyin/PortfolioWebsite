@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 import { TiptapContent } from '../../components/public/TiptapContent'
 import { PageMeta } from '../../components/PageMeta'
@@ -9,6 +10,7 @@ import { ApiError } from '../../lib/api-client'
 import './article-detail-page.css'
 
 export function ArticleDetailPage() {
+  const { i18n, t } = useTranslation()
   const { slug } = useParams()
   const articleQuery = useQuery({
     ...articleQueries.detail(slug ?? ''),
@@ -28,11 +30,11 @@ export function ArticleDetailPage() {
 
     return (
       <ArticleDetailMessage
-        title={notFound ? 'Note not found' : 'This note is unavailable'}
+        title={notFound ? t('article.notFound') : t('article.unavailable')}
         message={
           notFound
-            ? 'It may have moved, returned to draft, or never existed.'
-            : 'The article could not be loaded. Check that the API is running and try again.'
+            ? t('article.notFoundMessage')
+            : t('article.unavailableMessage')
         }
         onRetry={notFound ? undefined : () => articleQuery.refetch()}
       />
@@ -40,7 +42,8 @@ export function ArticleDetailPage() {
   }
 
   const article = articleQuery.data
-  const publishedDate = new Intl.DateTimeFormat('en-GB', {
+  const locale = i18n.resolvedLanguage?.startsWith('tr') ? 'tr-TR' : i18n.resolvedLanguage?.startsWith('de') ? 'de-DE' : 'en-GB'
+  const publishedDate = new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -54,7 +57,7 @@ export function ArticleDetailPage() {
           {article.category ? (
             <Link to={`/categories/${article.category.slug}`}>{article.category.name}</Link>
           ) : (
-            <span>Uncategorized</span>
+            <span>{t('archive.uncategorized')}</span>
           )}
           <time dateTime={article.publishedAt}>{publishedDate}</time>
         </div>
@@ -64,31 +67,31 @@ export function ArticleDetailPage() {
 
       {article.headerImageUrl && (
         <figure className="article-detail__hero">
-          <img src={article.headerImageUrl} alt={`Header visual for ${article.title}`} />
+          <img src={article.headerImageUrl} alt={t('article.imageAlt', { title: article.title })} />
         </figure>
       )}
 
       <div className="article-detail__layout">
         <aside className="article-detail__aside">
-          <p className="eyebrow">Tags</p>
+          <p className="eyebrow">{t('article.tags')}</p>
           <div className="article-detail__tags">
             {article.tags.length > 0
               ? article.tags.map((tag) => (
                   <Link key={tag.id} to={`/tags/${tag.slug}`}>#{tag.name}</Link>
                 ))
-              : <span>No tags</span>}
+              : <span>{t('article.noTags')}</span>}
           </div>
         </aside>
         <div className="article-prose">
-          {article.content ? <TiptapContent document={article.content} /> : <p>No content yet.</p>}
+          {article.content ? <TiptapContent document={article.content} /> : <p>{t('article.noContent')}</p>}
         </div>
       </div>
 
       <footer className="article-detail__footer">
-        <Link to="/articles"><ArrowLeft aria-hidden="true" /> All articles</Link>
+        <Link to="/articles"><ArrowLeft aria-hidden="true" /> {t('article.allArticles')}</Link>
         {article.category && (
           <Link to={`/categories/${article.category.slug}`}>
-            More in {article.category.name} <ArrowUpRight aria-hidden="true" />
+            {t('article.moreIn', { name: article.category.name })} <ArrowUpRight aria-hidden="true" />
           </Link>
         )}
       </footer>
@@ -97,8 +100,9 @@ export function ArticleDetailPage() {
 }
 
 function ArticleDetailLoading() {
+  const { t } = useTranslation()
   return (
-    <div className="article-detail-loading" aria-label="Loading article">
+    <div className="article-detail-loading" aria-label={t('article.loading')}>
       <span />
       <span />
       <span />
@@ -107,14 +111,15 @@ function ArticleDetailLoading() {
 }
 
 function ArticleDetailMessage({ title, message, onRetry }: { title: string; message: string; onRetry?: () => void }) {
+  const { t } = useTranslation()
   return (
     <section className="article-detail-message">
-      <p className="eyebrow">Archive status</p>
+      <p className="eyebrow">{t('archive.status')}</p>
       <h1>{title}</h1>
       <p>{message}</p>
       <div className="article-detail-message__actions">
-        {onRetry && <button type="button" onClick={onRetry}>Try again</button>}
-        <Link to="/articles"><ArrowLeft aria-hidden="true" /> Return to all articles</Link>
+        {onRetry && <button type="button" onClick={onRetry}>{t('archive.retry')}</button>}
+        <Link to="/articles"><ArrowLeft aria-hidden="true" /> {t('article.return')}</Link>
       </div>
     </section>
   )

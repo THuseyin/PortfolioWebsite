@@ -3,9 +3,11 @@ import { ArrowDown, ArrowUpRight, AtSign } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 import { AdminLoginDialog } from '../../components/public/AdminLoginDialog'
 import { HomeNavigation } from '../../components/public/HomeNavigation'
+import { LanguageSwitcher } from '../../components/public/LanguageSwitcher'
 import { PageMeta } from '../../components/PageMeta'
 import { articleQueries } from '../../features/articles/article-queries'
 import { homepageQueries } from '../../features/homepage/homepage-api'
@@ -36,6 +38,7 @@ const fallbackHomepage: HomepageContent = {
 }
 
 export function HomePage() {
+  const { t } = useTranslation()
   const [activeSection, setActiveSection] = useState(1)
   const homepageQuery = useQuery(homepageQueries.public())
   const content = homepageQuery.data ?? fallbackHomepage
@@ -97,7 +100,7 @@ export function HomePage() {
         </div>
         <CityTimes locations={content.locations} />
         <a className="hero-scroll" href="#recent-notes">
-          <span>Scroll to enter</span>
+          <span>{t('home.scroll')}</span>
           <ArrowDown aria-hidden="true" />
         </a>
       </section>
@@ -106,7 +109,7 @@ export function HomePage() {
 
       <section className="home-panel about-panel" id="personal-note" data-home-section="3">
         <div className="section-heading">
-          <p className="eyebrow">03 / Personal note</p>
+          <p className="eyebrow">03 / {t('home.personal')}</p>
           <span className="section-heading__line" />
         </div>
         <div className="about-panel__body">
@@ -115,16 +118,16 @@ export function HomePage() {
             <p>{content.aboutNote}</p>
             <dl>
               <div>
-                <dt>Currently</dt>
+                <dt>{t('home.currently')}</dt>
                 <dd>{content.currently}</dd>
               </div>
               <div>
-                <dt>Interested in</dt>
+                <dt>{t('home.interested')}</dt>
                 <dd>{content.interests}</dd>
               </div>
             </dl>
             <Link className="text-link" to="/articles">
-              Explore the archive <ArrowUpRight aria-hidden="true" />
+              {t('home.archive')} <ArrowUpRight aria-hidden="true" />
             </Link>
             <a
               className="text-link"
@@ -143,16 +146,18 @@ export function HomePage() {
 }
 
 function HomeChrome({ activeSection }: { activeSection: number }) {
+  const { t } = useTranslation()
   const onDarkSection = activeSection === 2
 
   return (
     <>
       <div className={`home-chrome${onDarkSection ? ' home-chrome--light' : ''}`}>
-        <a className="home-mark" href="#identity" aria-label="Go to the first section">
+        <a className="home-mark" href="#identity" aria-label={t('navigation.home')}>
           HT
         </a>
         <nav aria-label="Homepage shortcuts">
           <HomeNavigation />
+          <LanguageSwitcher inverted={onDarkSection} />
           <AdminLoginDialog />
         </nav>
       </div>
@@ -208,6 +213,7 @@ function Collage({ images }: { images: string[] }) {
 }
 
 function CityTimes({ locations }: { locations: HomepageLocation[] }) {
+  const { t } = useTranslation()
   const [now, setNow] = useState(() => new Date())
 
   useEffect(() => {
@@ -217,7 +223,7 @@ function CityTimes({ locations }: { locations: HomepageLocation[] }) {
 
   return (
     <aside className="city-times" aria-label="Local times">
-      <p className="eyebrow">Local / {now.getFullYear()}</p>
+      <p className="eyebrow">{t('home.local')} / {now.getFullYear()}</p>
       {locations.map((location) => (
         <CityTime key={`${location.city}-${location.timeZone}`} {...location} now={now} />
       ))}
@@ -248,28 +254,29 @@ function CityTime({ city, timeZone, now }: { city: string; timeZone: string; now
 }
 
 function LatestArticlesSection() {
+  const { t } = useTranslation()
   const latestArticlesQuery = useQuery(articleQueries.latest(3))
   const articles = latestArticlesQuery.data?.items ?? []
 
   return (
     <section className="home-panel articles-panel" id="recent-notes" data-home-section="2">
       <div className="section-heading">
-        <p className="eyebrow">02 / Recent notes</p>
+        <p className="eyebrow">02 / {t('home.recent')}</p>
         <span className="section-heading__line" />
-        <Link to="/articles">View all ↗</Link>
+        <Link to="/articles">{t('home.viewAll')} ↗</Link>
       </div>
       <div className="article-grid">
         {latestArticlesQuery.isPending && <ArticleLoadingState />}
         {latestArticlesQuery.isError && (
           <ArticleMessageState
-            title="The archive is offline"
-            message="Start the API to load published articles."
+            title={t('home.offlineTitle')}
+            message={t('home.offlineMessage')}
           />
         )}
         {latestArticlesQuery.isSuccess && !articles.length && (
           <ArticleMessageState
-            title="No published notes yet"
-            message="Published articles will appear here."
+            title={t('home.emptyTitle')}
+            message={t('home.emptyMessage')}
           />
         )}
         {latestArticlesQuery.isSuccess &&
@@ -282,8 +289,9 @@ function LatestArticlesSection() {
 }
 
 function ArticleLoadingState() {
+  const { t } = useTranslation()
   return (
-    <div className="article-state article-state--loading" aria-label="Loading recent articles">
+    <div className="article-state article-state--loading" aria-label={t('home.latestLoading')}>
       <span />
       <span />
       <span />
@@ -292,9 +300,10 @@ function ArticleLoadingState() {
 }
 
 function ArticleMessageState({ title, message }: { title: string; message: string }) {
+  const { t } = useTranslation()
   return (
     <div className="article-state article-state--message">
-      <p className="eyebrow">Archive status</p>
+      <p className="eyebrow">{t('home.status')}</p>
       <h3>{title}</h3>
       <p>{message}</p>
     </div>
@@ -302,6 +311,7 @@ function ArticleMessageState({ title, message }: { title: string; message: strin
 }
 
 function ArticleCard({ article, index }: { article: ArticleSummary; index: number }) {
+  const { i18n, t } = useTranslation()
   const body = (
     <>
       <img
@@ -309,13 +319,13 @@ function ArticleCard({ article, index }: { article: ArticleSummary; index: numbe
           article.headerImageUrl ??
           `/images/home-collage/collage-${String(index + 2).padStart(2, '0')}.jpg`
         }
-        alt={`Header visual for ${article.title}`}
+        alt={t('article.imageAlt', { title: article.title })}
       />
       <div className="article-card__shade" />
       <div className="article-card__meta">
-        <span>{article.category?.name ?? 'Uncategorized'}</span>
+        <span>{article.category?.name ?? t('archive.uncategorized')}</span>
         <time dateTime={article.publishedAt}>
-          {new Intl.DateTimeFormat('en-GB', {
+          {new Intl.DateTimeFormat(dateLocale(i18n.resolvedLanguage), {
             day: '2-digit',
             month: 'short',
             year: 'numeric',
@@ -337,4 +347,10 @@ function ArticleCard({ article, index }: { article: ArticleSummary; index: numbe
   ) : (
     <article className={`article-card article-card--${index + 1}`}>{body}</article>
   )
+}
+
+function dateLocale(language?: string) {
+  if (language?.startsWith('tr')) return 'tr-TR'
+  if (language?.startsWith('de')) return 'de-DE'
+  return 'en-GB'
 }
