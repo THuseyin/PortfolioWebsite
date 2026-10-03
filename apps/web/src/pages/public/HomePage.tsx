@@ -170,6 +170,17 @@ function HomeChrome({ activeSection }: { activeSection: number }) {
 
 function Collage({ images }: { images: string[] }) {
   const collageRows = [images.slice(0, 4), images.slice(4, 8), images.slice(8, 12)]
+
+  const adaptImageRatio = (image: HTMLImageElement) => {
+    const figure = image.parentElement
+
+    if (!figure || image.naturalHeight === 0) return
+
+    const naturalRatio = image.naturalWidth / image.naturalHeight
+    const displayRatio = Math.min(2.4, Math.max(0.6, naturalRatio))
+    figure.style.setProperty('--image-ratio', String(displayRatio))
+  }
+
   return (
     <div className="hero-collage" aria-hidden="true">
       {collageRows.map((row, rowIndex) => {
@@ -179,7 +190,11 @@ function Collage({ images }: { images: string[] }) {
             <div className="collage-track">
               {repeatedRow.map((imageUrl, imageIndex) => (
                 <figure key={`${imageUrl}-${imageIndex}`}>
-                  <img src={imageUrl} alt="" />
+                  <img
+                    src={imageUrl}
+                    alt=""
+                    onLoad={(event) => adaptImageRatio(event.currentTarget)}
+                  />
                 </figure>
               ))}
             </div>
