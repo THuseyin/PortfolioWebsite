@@ -13,21 +13,25 @@ import { CategoryArticlesPage } from '../pages/public/CategoryArticlesPage'
 import { HomePage } from '../pages/public/HomePage'
 import { TagArticlesPage } from '../pages/public/TagArticlesPage'
 import { NotFoundPage } from '../pages/shared/NotFoundPage'
+import { RouteErrorPage } from '../pages/shared/RouteErrorPage'
 
 export const router = createBrowserRouter([
-  { index: true, element: <HomePage /> },
+  { index: true, element: <HomePage />, errorElement: <RouteErrorPage /> },
   {
     element: <PublicLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       { path: 'articles', element: <ArticlesPage /> },
       { path: 'articles/:slug', element: <ArticleDetailPage /> },
       { path: 'categories/:categorySlug', element: <CategoryArticlesPage /> },
       { path: 'tags/:tagSlug', element: <TagArticlesPage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
   {
     path: 'admin',
     element: <AdminLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: 'homepage', element: <AdminHomepagePage /> },
@@ -50,5 +54,4 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  { path: '*', element: <NotFoundPage /> },
 ])

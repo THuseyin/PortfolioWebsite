@@ -139,8 +139,7 @@
   text-transform: uppercase;
 }
 
-.article-detail__footer a,
-.article-detail-message a { display: inline-flex; align-items: center; gap: 0.45rem; }
+.article-detail__footer a { display: inline-flex; align-items: center; gap: 0.45rem; }
 .article-detail__footer svg,
 .article-detail-message svg { width: 0.85rem; height: 0.85rem; }
 
@@ -152,7 +151,10 @@
 .article-detail-message { min-height: 60vh; padding-top: clamp(4rem, 10vw, 9rem); }
 .article-detail-message h1 { margin: 1.5rem 0; font-family: var(--font-display); font-size: clamp(3.5rem, 9vw, 8rem); font-weight: 400; letter-spacing: -0.06em; line-height: 0.9; }
 .article-detail-message > p:not(.eyebrow) { max-width: 35rem; color: var(--muted); line-height: 1.6; }
-.article-detail-message a { margin-top: 2rem; color: var(--signal); font-family: var(--font-mono); font-size: 0.625rem; letter-spacing: 0.07em; text-transform: uppercase; }
+.article-detail-message__actions { display: flex; margin-top: 2rem; flex-wrap: wrap; gap: 0.75rem; }
+.article-detail-message__actions a,
+.article-detail-message__actions button { display: inline-flex; min-height: 2.7rem; padding: 0.65rem 0.8rem; border: 1px solid var(--line-strong); align-items: center; color: var(--ink); background: transparent; cursor: pointer; font-family: var(--font-mono); font-size: 0.625rem; gap: 0.45rem; letter-spacing: 0.07em; text-transform: uppercase; }
+.article-detail-message__actions button { border-color: var(--signal); color: var(--signal-contrast); background: var(--signal); }
 
 @keyframes article-detail-shimmer { to { background-position: -200% 0; } }
 

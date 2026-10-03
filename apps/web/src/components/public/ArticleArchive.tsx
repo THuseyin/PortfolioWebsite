@@ -9,6 +9,7 @@ type ArticleArchiveProps = {
   isError: boolean
   isPending: boolean
   onPageChange: (page: number) => void
+  onRetry: () => void
   page: number
   pagination?: PaginatedArticles['pagination']
 }
@@ -19,6 +20,7 @@ export function ArticleArchive({
   isError,
   isPending,
   onPageChange,
+  onRetry,
   page,
   pagination,
 }: ArticleArchiveProps) {
@@ -26,7 +28,7 @@ export function ArticleArchive({
     <>
       <section className="archive-list" aria-label="Article archive">
         {isPending && <ArchiveLoading />}
-        {isError && <ArchiveMessage title="The archive is offline" message={errorMessage} />}
+        {isError && <ArchiveMessage title="The archive is offline" message={errorMessage} onRetry={onRetry} />}
         {!isPending && !isError && articles.length === 0 && (
           <ArchiveMessage
             title="No published notes yet"
@@ -107,12 +109,13 @@ function ArchiveLoading() {
   )
 }
 
-function ArchiveMessage({ title, message }: { title: string; message: string }) {
+function ArchiveMessage({ title, message, onRetry }: { title: string; message: string; onRetry?: () => void }) {
   return (
     <div className="archive-message">
       <p className="eyebrow">Archive status</p>
       <h2>{title}</h2>
       <p>{message}</p>
+      {onRetry && <button type="button" onClick={onRetry}>Try again</button>}
     </div>
   )
 }

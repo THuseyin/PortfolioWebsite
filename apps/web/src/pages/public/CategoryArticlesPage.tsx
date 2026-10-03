@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Navigate, useParams, useSearchParams } from 'react-router'
 
 import { ArticleArchive } from '../../components/public/ArticleArchive'
+import { PageMeta } from '../../components/PageMeta'
 import { articleQueries } from '../../features/articles/article-queries'
 import { categoryQueries } from '../../features/categories/category-queries'
 import './articles-page.css'
@@ -35,6 +36,7 @@ export function CategoryArticlesPage() {
 
   return (
     <div className="archive-page archive-page--category">
+      <PageMeta title={categoryName} description={`Articles filed under ${categoryName}.`} />
       <header className="archive-hero">
         <h1>{categoryName}</h1>
         <span className="archive-hero__count">
@@ -47,6 +49,7 @@ export function CategoryArticlesPage() {
         errorMessage={`The ${categoryName} notes could not be loaded. Please try again.`}
         isError={articlesQuery.isError || categoriesQuery.isError}
         isPending={articlesQuery.isPending || categoriesQuery.isPending}
+        onRetry={() => { articlesQuery.refetch(); categoriesQuery.refetch() }}
         onPageChange={changePage}
         page={page}
         pagination={pagination}

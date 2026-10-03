@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router'
 
 import { ArticleArchive } from '../../components/public/ArticleArchive'
+import { PageMeta } from '../../components/PageMeta'
 import { articleQueries } from '../../features/articles/article-queries'
 import './articles-page.css'
 
@@ -22,6 +23,7 @@ export function ArticlesPage() {
 
   return (
     <div className="archive-page">
+      <PageMeta title="All Articles" description="Writing about software, systems, interfaces, and ongoing experiments." />
       <header className="archive-hero">
         <h1>All Articles</h1>
         <span className="archive-hero__count">
@@ -34,6 +36,7 @@ export function ArticlesPage() {
         errorMessage="The notes could not be loaded. Check that the API is running and try again."
         isError={articlesQuery.isError}
         isPending={articlesQuery.isPending}
+        onRetry={() => articlesQuery.refetch()}
         onPageChange={changePage}
         page={page}
         pagination={pagination}

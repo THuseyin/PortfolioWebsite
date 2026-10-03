@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Navigate, useParams, useSearchParams } from 'react-router'
 
 import { ArticleArchive } from '../../components/public/ArticleArchive'
+import { PageMeta } from '../../components/PageMeta'
 import { articleQueries } from '../../features/articles/article-queries'
 import { tagQueries } from '../../features/tags/tag-queries'
 import './articles-page.css'
@@ -34,6 +35,7 @@ export function TagArticlesPage() {
 
   return (
     <div className="archive-page archive-page--tag">
+      <PageMeta title={`#${tagName}`} description={`Articles tagged with ${tagName}.`} />
       <header className="archive-hero">
         <h1>#{tagName}</h1>
         <span className="archive-hero__count">
@@ -46,6 +48,7 @@ export function TagArticlesPage() {
         errorMessage={`The ${tagName} notes could not be loaded. Please try again.`}
         isError={articlesQuery.isError || tagsQuery.isError}
         isPending={articlesQuery.isPending || tagsQuery.isPending}
+        onRetry={() => { articlesQuery.refetch(); tagsQuery.refetch() }}
         onPageChange={changePage}
         page={page}
         pagination={pagination}

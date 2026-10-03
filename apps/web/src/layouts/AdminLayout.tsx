@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { LogOut } from 'lucide-react'
-import { NavLink, Navigate, Outlet, useNavigate } from 'react-router'
+import { NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router'
 
+import { PageMeta } from '../components/PageMeta'
 import { authQueries, logoutAdmin } from '../features/auth/auth-api'
 import './admin-layout.css'
 
@@ -9,6 +10,7 @@ export function AdminLayout() {
   const sessionQuery = useQuery(authQueries.session())
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const location = useLocation()
   const logoutMutation = useMutation({
     mutationFn: logoutAdmin,
     onSuccess: () => {
@@ -27,6 +29,7 @@ export function AdminLayout() {
 
   return (
     <div className="admin-shell">
+      <PageMeta title={adminPageTitle(location.pathname)} description="Private publishing workspace." />
       <header className="admin-shell__header">
         <NavLink className="admin-shell__identity" to="/admin" aria-label="Admin dashboard">
           <span className="admin-shell__mark" aria-hidden="true">HT</span>
@@ -51,4 +54,14 @@ export function AdminLayout() {
       <div className="admin-shell__content"><Outlet /></div>
     </div>
   )
+}
+
+function adminPageTitle(pathname: string) {
+  if (pathname.includes('/articles/') && pathname.endsWith('/edit')) return 'Edit Article / Admin'
+  if (pathname.endsWith('/articles/new')) return 'New Article / Admin'
+  if (pathname.includes('/homepage')) return 'Homepage / Admin'
+  if (pathname.includes('/articles')) return 'Articles / Admin'
+  if (pathname.includes('/categories')) return 'Categories / Admin'
+  if (pathname.includes('/tags')) return 'Tags / Admin'
+  return 'Dashboard / Admin'
 }

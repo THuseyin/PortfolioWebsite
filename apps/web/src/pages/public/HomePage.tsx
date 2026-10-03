@@ -6,6 +6,7 @@ import { Link } from 'react-router'
 
 import { AdminLoginDialog } from '../../components/public/AdminLoginDialog'
 import { HomeNavigation } from '../../components/public/HomeNavigation'
+import { PageMeta } from '../../components/PageMeta'
 import { articleQueries } from '../../features/articles/article-queries'
 import { homepageQueries } from '../../features/homepage/homepage-api'
 import type { ArticleSummary } from '../../types/article'
@@ -60,6 +61,7 @@ export function HomePage() {
 
   return (
     <div className="home-experience">
+      <PageMeta description={content.aboutNote} />
       <HomeChrome activeSection={activeSection} />
       <section className="home-panel hero-panel" id="identity" data-home-section="1">
         <Collage images={content.collageImages} />

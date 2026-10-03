@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router'
 
 import { TiptapContent } from '../../components/public/TiptapContent'
+import { PageMeta } from '../../components/PageMeta'
 import { articleQueries } from '../../features/articles/article-queries'
 import { ApiError } from '../../lib/api-client'
 import './article-detail-page.css'
@@ -33,6 +34,7 @@ export function ArticleDetailPage() {
             ? 'It may have moved, returned to draft, or never existed.'
             : 'The article could not be loaded. Check that the API is running and try again.'
         }
+        onRetry={notFound ? undefined : () => articleQuery.refetch()}
       />
     )
   }
@@ -46,6 +48,7 @@ export function ArticleDetailPage() {
 
   return (
     <article className="article-detail">
+      <PageMeta title={article.title} description={article.summary} image={article.headerImageUrl} type="article" />
       <header className="article-detail__header">
         <div className="article-detail__meta">
           {article.category ? (
@@ -103,13 +106,16 @@ function ArticleDetailLoading() {
   )
 }
 
-function ArticleDetailMessage({ title, message }: { title: string; message: string }) {
+function ArticleDetailMessage({ title, message, onRetry }: { title: string; message: string; onRetry?: () => void }) {
   return (
     <section className="article-detail-message">
       <p className="eyebrow">Archive status</p>
       <h1>{title}</h1>
       <p>{message}</p>
-      <Link to="/articles"><ArrowLeft aria-hidden="true" /> Return to all articles</Link>
+      <div className="article-detail-message__actions">
+        {onRetry && <button type="button" onClick={onRetry}>Try again</button>}
+        <Link to="/articles"><ArrowLeft aria-hidden="true" /> Return to all articles</Link>
+      </div>
     </section>
   )
 }

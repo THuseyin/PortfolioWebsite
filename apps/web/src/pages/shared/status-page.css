@@ -1,0 +1,20 @@
+.status-page { display: grid; min-height: min(44rem, 72vh); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); grid-template-columns: minmax(6rem, 0.35fr) minmax(0, 1.65fr); }
+.status-page--error { width: min(calc(100% - 2 * var(--page-gutter)), var(--content-width)); min-height: calc(100vh - 2 * var(--page-gutter)); margin: var(--page-gutter) auto; background: var(--paper); }
+.status-page__index { display: flex; padding: 1.25rem; border-right: 1px solid var(--ink); flex-direction: column; justify-content: space-between; color: var(--signal); font-family: var(--font-mono); font-size: 0.65rem; }
+.status-page__index i { width: 1px; height: 8rem; background: var(--ink); opacity: 0.35; }
+.status-page__content { display: grid; padding: clamp(2rem, 7vw, 7rem); align-content: center; justify-items: start; }
+.status-page__content h1 { max-width: 10ch; margin: 1.5rem 0; font-family: var(--font-display); font-size: clamp(4rem, 10vw, 9rem); font-weight: 400; letter-spacing: -0.07em; line-height: 0.82; }
+.status-page__content > p:not(.eyebrow) { max-width: 36rem; margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.65; }
+.status-page__actions { display: flex; margin-top: 2.5rem; flex-wrap: wrap; gap: 0.75rem; }
+.status-page__actions a,
+.status-page__actions button { display: inline-flex; min-height: 2.8rem; padding: 0.7rem 0.9rem; border: 1px solid var(--line-strong); align-items: center; color: var(--ink); background: transparent; cursor: pointer; font-family: var(--font-mono); font-size: 0.58rem; gap: 0.45rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.status-page__actions a:first-child,
+.status-page__actions button:first-child { border-color: var(--signal); color: var(--signal-contrast); background: var(--signal); }
+.status-page__actions svg { width: 0.8rem; height: 0.8rem; }
+
+@media (max-width: 40rem) {
+  .status-page { min-height: 65vh; grid-template-columns: 3.5rem minmax(0, 1fr); }
+  .status-page__index { padding: 1rem 0.75rem; }
+  .status-page__content { padding: 2.5rem 1.25rem; }
+  .status-page__content h1 { font-size: clamp(3.4rem, 18vw, 5.5rem); }
+}
