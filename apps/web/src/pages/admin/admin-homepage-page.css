@@ -2,6 +2,7 @@
 .admin-homepage__state { padding-block: 8rem; color: var(--muted); font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; }
 .admin-homepage__header { align-items: flex-end; }
 .admin-homepage__header h1 { margin: 0.65rem 0 0; font-family: var(--font-display); font-size: clamp(3.5rem, 8vw, 7rem); font-weight: 400; letter-spacing: -0.065em; line-height: 0.85; }
+.admin-homepage__header .admin-primary-action:disabled { cursor: default; }
 .admin-homepage__layout { display: grid; margin-top: clamp(2rem, 5vw, 4rem); grid-template-columns: minmax(0, 1.15fr) minmax(24rem, 0.85fr); align-items: start; gap: clamp(2.5rem, 6vw, 6rem); }
 .admin-homepage__fields { display: grid; gap: 3rem; }
 .admin-homepage__section { border-top: 1px solid var(--ink); }

@@ -19,7 +19,7 @@ export function AdminHomepagePage() {
   if (query.isPending) return <main className="admin-homepage admin-homepage__state">Loading homepage…</main>
   if (query.isError) return <main className="admin-homepage admin-homepage__state">Homepage content could not be loaded.</main>
 
-  return <HomepageForm initial={query.data} key={query.data.updatedAt} />
+  return <HomepageForm initial={query.data} key={query.data.id} />
 }
 
 function HomepageForm({ initial }: { initial: HomepageContent }) {
@@ -115,7 +115,7 @@ function HomepageForm({ initial }: { initial: HomepageContent }) {
       <form onSubmit={submit}>
         <header className="admin-page-header admin-homepage__header">
           <div><p className="eyebrow">Site content / Homepage</p><h1>Homepage</h1></div>
-          <button className="admin-primary-action" disabled={!dirty || saveMutation.isPending || uploadMutation.isPending} type="submit">
+          <button aria-busy={saveMutation.isPending} className="admin-primary-action" disabled={!dirty || saveMutation.isPending || uploadMutation.isPending} type="submit">
             <Save aria-hidden="true" /> {saveMutation.isPending ? 'Saving…' : 'Save changes'}
           </button>
         </header>
