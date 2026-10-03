@@ -5,6 +5,7 @@ import { PublicLayout } from '../layouts/PublicLayout'
 import { AdminArticlesPage } from '../pages/admin/AdminArticlesPage'
 import { AdminCategoriesPage } from '../pages/admin/AdminCategoriesPage'
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage'
+import { AdminHomepagePage } from '../pages/admin/AdminHomepagePage'
 import { AdminTagsPage } from '../pages/admin/AdminTagsPage'
 import { ArticleDetailPage } from '../pages/public/ArticleDetailPage'
 import { ArticlesPage } from '../pages/public/ArticlesPage'
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { index: true, element: <AdminDashboardPage /> },
+      { path: 'homepage', element: <AdminHomepagePage /> },
       { path: 'articles', element: <AdminArticlesPage /> },
       { path: 'categories', element: <AdminCategoriesPage /> },
       { path: 'tags', element: <AdminTagsPage /> },

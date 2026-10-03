@@ -7,6 +7,7 @@ import { ArticlesModule } from './articles/articles.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { MediaModule } from './media/media.module.js';
+import { HomepageModule } from './homepage/homepage.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { TagsModule } from './tags/tags.module.js';
 
@@ -22,6 +23,7 @@ import { TagsModule } from './tags/tags.module.js';
     TagsModule,
     ArticlesModule,
     MediaModule,
+    HomepageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

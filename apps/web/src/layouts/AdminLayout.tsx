@@ -31,6 +31,7 @@ export function AdminLayout() {
         <NavLink className="admin-shell__identity" to="/admin">HT / Admin</NavLink>
         <nav aria-label="Admin navigation">
           <NavLink to="/admin" end>Dashboard</NavLink>
+          <NavLink to="/admin/homepage">Homepage</NavLink>
           <NavLink to="/admin/articles">Articles</NavLink>
           <NavLink to="/admin/categories">Categories</NavLink>
           <NavLink to="/admin/tags">Tags</NavLink>

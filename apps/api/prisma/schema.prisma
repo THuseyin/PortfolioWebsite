@@ -69,3 +69,19 @@ model Session {
   @@index([expire], map: "IDX_session_expire")
   @@map("session")
 }
+
+model HomePageContent {
+  id             String   @id @default("home")
+  name           String
+  eyebrow        String
+  role           String
+  locations      Json
+  aboutHeadline  String
+  aboutNote      String
+  currently      String
+  interests      String
+  instagramLabel String
+  instagramUrl   String
+  collageImages  Json
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+}
