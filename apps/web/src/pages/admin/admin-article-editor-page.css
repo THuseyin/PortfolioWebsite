@@ -40,10 +40,19 @@
 .admin-tiptap__toolbar button.is-active { border-color: var(--signal); color: var(--signal); }
 .admin-tiptap__toolbar button:disabled { cursor: wait; opacity: 0.35; }
 .admin-tiptap__toolbar svg { width: 0.95rem; height: 0.95rem; }
-.admin-tiptap__content { min-height: 34rem; padding: clamp(1.5rem, 4vw, 3.5rem); outline: none; font-size: 1rem; line-height: 1.75; }
+.admin-tiptap__content { min-height: 34rem; padding: clamp(1.5rem, 4vw, 3.5rem); outline: none; font-size: clamp(1rem, 1.1vw, 1.1rem); line-height: 1.75; }
 .admin-tiptap__content > :first-child { margin-top: 0; }
 .admin-tiptap__content p { margin: 0 0 1.3em; }
-.admin-tiptap__content h2 { margin: 1.8em 0 0.6em; font-family: var(--font-display); font-size: clamp(2.2rem, 4vw, 4rem); font-weight: 400; letter-spacing: -0.045em; line-height: 1; }
+.admin-tiptap__content h2,
+.admin-tiptap__content h3,
+.admin-tiptap__content h4,
+.admin-tiptap__content h5,
+.admin-tiptap__content h6 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; }
+.admin-tiptap__content h2 { margin: 3rem 0 0.8rem; font-size: clamp(2rem, 3vw, 3.15rem); letter-spacing: -0.04em; line-height: 1.06; }
+.admin-tiptap__content h3 { margin: 2.4rem 0 0.7rem; font-size: clamp(1.5rem, 2vw, 2.15rem); letter-spacing: -0.025em; line-height: 1.14; }
+.admin-tiptap__content h4,
+.admin-tiptap__content h5,
+.admin-tiptap__content h6 { margin: 2rem 0 0.65rem; font-size: clamp(1.2rem, 1.5vw, 1.5rem); letter-spacing: -0.015em; line-height: 1.2; }
 .admin-tiptap__content ul,
 .admin-tiptap__content ol { padding-left: 1.5rem; }
 .admin-tiptap__content blockquote { margin: 2rem 0; padding-left: 1.25rem; border-left: 3px solid var(--signal); font-family: var(--font-display); font-size: 1.35rem; }
