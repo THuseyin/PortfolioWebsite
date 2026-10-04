@@ -5,6 +5,7 @@ import { Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
 
 import { categoryQueries } from '../../features/categories/category-queries'
+import { InstagramIcon } from './InstagramIcon'
 import './home-navigation.css'
 
 export function HomeNavigation() {
@@ -58,7 +59,7 @@ export function HomeNavigation() {
               </div>
             </div>
             <a href="https://www.instagram.com/tepee.huseyin/" target="_blank" rel="noreferrer">
-              Instagram <ArrowUpRight aria-hidden="true" />
+              <InstagramIcon aria-hidden="true" /> Instagram <ArrowUpRight aria-hidden="true" />
             </a>
           </div>
         </Dialog.Content>

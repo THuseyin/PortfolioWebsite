@@ -1,0 +1,11 @@
+export const zh = {
+  language: { label: '语言', english: '英语', turkish: '土耳其语', german: '德语', chinese: '中文', spanish: '西班牙语', hindi: '印地语' },
+  navigation: { explore: '探索', title: '探索网站', close: '关闭导航', home: '首页', recent: '最新文章', personal: '个人笔记', allArticles: '全部文章', categories: '分类', categoriesEmpty: '分类将在这里显示', unavailable: '分类暂不可用', primary: '主导航', mobile: '移动导航', open: '打开导航', index: '导航' },
+  home: { scroll: '向下滚动进入', local: '当地', recent: '最新文章', viewAll: '查看全部', personal: '个人笔记', currently: '目前', interested: '兴趣方向', archive: '探索文章库', latestLoading: '正在加载最新文章', offlineTitle: '文章库已离线', offlineMessage: '请启动 API 以加载已发布文章。', emptyTitle: '尚无已发布文章', emptyMessage: '已发布的文章将在这里显示。', status: '文章库状态' },
+  archive: { title: '全部文章', description: '关于软件、系统、界面与持续实验的文章。', notes: '篇文章', loading: '正在加载文章', label: '文章库', status: '文章库状态', offlineTitle: '文章库已离线', emptyTitle: '尚无已发布文章', emptyMessage: '新文章发布后将在这里显示。', retry: '重试', previous: '上一页', next: '下一页', pagination: '文章库分页', uncategorized: '未分类', loadError: '无法加载文章。请检查 API 是否运行后重试。', filteredError: '无法加载 {{name}} 的文章，请重试。', categoryDescription: '{{name}} 分类下的文章。', tagDescription: '带有 {{name}} 标签的文章。' },
+  article: { notFound: '未找到文章', unavailable: '此文章暂不可用', notFoundMessage: '它可能已被移动、转为草稿或从未存在。', unavailableMessage: '无法加载文章。请检查 API 是否运行后重试。', tags: '标签', noTags: '无标签', noContent: '暂无内容。', allArticles: '全部文章', moreIn: '更多 {{name}} 内容', loading: '正在加载文章', return: '返回全部文章', imageAlt: '{{title}} 的头图' },
+  login: { trigger: '管理', eyebrow: '受限 / 01', title: '管理员登录', close: '关闭登录窗口', description: '请输入私人凭据以打开发布工作区。', username: '用户名', password: '密码', continue: '继续', checking: '正在验证…', missing: '请输入用户名和密码。', incorrect: '用户名或密码错误。', unavailable: '管理员登录暂不可用，请重试。', popup: '登录成功。请允许弹出窗口以打开管理工作区。' },
+  footer: { browse: '浏览文章库', top: '返回顶部' },
+  status: { notFoundMeta: '页面未找到', errorMeta: '出现错误', notFoundDescription: '找不到请求的页面。', wrongTurn: '走错了 / 空白页面', interrupted: '系统 / 已中断', nowhere: '这条路径无处可去。', slipped: '这个页面消失了。', lostThread: '页面失去了线索。', missingMessage: '页面可能已被移动、转为草稿或从未存在。', changedMessage: '地址可能已更改，或页面已不存在。', errorMessage: '意外错误中断了此视图，你的内容未被修改。', home: '返回首页', browse: '浏览文章', retry: '重试' },
+  meta: { defaultTitle: '笔记与实验', defaultDescription: '关于软件、写作、旅行和数字实验的个人档案。' },
+}

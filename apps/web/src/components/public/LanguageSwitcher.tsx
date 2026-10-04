@@ -2,7 +2,10 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlagDe } from '@sankyu/react-circle-flags/flags/de'
+import { FlagCn } from '@sankyu/react-circle-flags/flags/cn'
+import { FlagEs } from '@sankyu/react-circle-flags/flags/es'
 import { FlagGb } from '@sankyu/react-circle-flags/flags/gb'
+import { FlagIn } from '@sankyu/react-circle-flags/flags/in'
 import { FlagTr } from '@sankyu/react-circle-flags/flags/tr'
 
 import { supportedLanguages, type SupportedLanguage } from '../../i18n'
@@ -12,6 +15,9 @@ const languageLabels: Record<SupportedLanguage, string> = {
   en: 'language.english',
   tr: 'language.turkish',
   de: 'language.german',
+  zh: 'language.chinese',
+  es: 'language.spanish',
+  hi: 'language.hindi',
 }
 
 export function LanguageSwitcher({ inverted = false }: { inverted?: boolean }) {
@@ -90,5 +96,8 @@ export function LanguageSwitcher({ inverted = false }: { inverted?: boolean }) {
 function LanguageMark({ language }: { language: SupportedLanguage }) {
   if (language === 'tr') return <FlagTr className="language-mark" aria-hidden="true" />
   if (language === 'de') return <FlagDe className="language-mark" aria-hidden="true" />
+  if (language === 'zh') return <FlagCn className="language-mark" aria-hidden="true" />
+  if (language === 'es') return <FlagEs className="language-mark" aria-hidden="true" />
+  if (language === 'hi') return <FlagIn className="language-mark" aria-hidden="true" />
   return <FlagGb className="language-mark" aria-hidden="true" />
 }

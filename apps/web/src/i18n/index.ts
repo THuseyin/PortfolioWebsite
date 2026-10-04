@@ -3,9 +3,12 @@ import { initReactI18next } from 'react-i18next'
 
 import { de } from './locales/de'
 import { en } from './locales/en'
+import { es } from './locales/es'
+import { hi } from './locales/hi'
 import { tr } from './locales/tr'
+import { zh } from './locales/zh'
 
-export const supportedLanguages = ['en', 'tr', 'de'] as const
+export const supportedLanguages = ['en', 'tr', 'de', 'zh', 'es', 'hi'] as const
 export type SupportedLanguage = (typeof supportedLanguages)[number]
 
 const storageKey = 'portfolio-language'
@@ -25,7 +28,10 @@ function detectLanguage(): SupportedLanguage {
 }
 
 void i18n.use(initReactI18next).init({
-  resources: { en: { translation: en }, tr: { translation: tr }, de: { translation: de } },
+  resources: {
+    en: { translation: en }, tr: { translation: tr }, de: { translation: de },
+    zh: { translation: zh }, es: { translation: es }, hi: { translation: hi },
+  },
   lng: detectLanguage(),
   fallbackLng: 'en',
   interpolation: { escapeValue: false },

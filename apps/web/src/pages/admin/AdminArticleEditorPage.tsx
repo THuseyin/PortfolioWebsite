@@ -3,7 +3,7 @@ import { EditorContent, useEditor, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import * as Dialog from '@radix-ui/react-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlignCenter, AlignLeft, AlignRight, ArrowLeft, Bold, Code2, Eye, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Maximize2, Quote, Redo2, Save, Undo2, Unlink, X } from 'lucide-react'
+import { AlignCenter, AlignLeft, AlignRight, ArrowLeft, Bold, Code2, Eye, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Maximize2, Plus, Quote, Redo2, Save, Undo2, Unlink, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useBlocker, useNavigate, useParams } from 'react-router'
 
@@ -20,6 +20,7 @@ import {
 } from '../../features/articles/admin-article-api'
 import { categoryQueries } from '../../features/categories/category-queries'
 import { tagQueries } from '../../features/tags/tag-queries'
+import { createTaxonomyItem, type TaxonomyItem, type TaxonomyKind } from '../../features/taxonomy/admin-taxonomy-api'
 import { ApiError } from '../../lib/api-client'
 import type { TiptapNode } from '../../types/article'
 import './admin-article-editor-page.css'
@@ -78,6 +79,7 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
   const [headerImageUrl, setHeaderImageUrl] = useState<string | null>(null)
   const [dirty, setDirty] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [taxonomyCreator, setTaxonomyCreator] = useState<TaxonomyKind | null>(null)
   const [feedback, setFeedback] = useState<{ type: 'error' | 'success'; message: string } | null>(null)
   const initializedArticleId = useRef<string | null>(null)
   const headerInputRef = useRef<HTMLInputElement>(null)
@@ -172,6 +174,33 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
     onSuccess: (image) => {
       editor?.chain().focus().setImage({ src: image.url }).run()
       setFeedback({ type: 'success', message: 'Image inserted into the article.' })
+    },
+    onError: (error) => {
+      if (!handleAuthError(error)) setFeedback({ type: 'error', message: errorMessage(error) })
+    },
+  })
+  const createTaxonomyMutation = useMutation({
+    mutationFn: ({ kind, name }: { kind: TaxonomyKind; name: string }) =>
+      createTaxonomyItem(kind, name),
+    onSuccess: (item, { kind }) => {
+      const queryKey = kind === 'categories'
+        ? categoryQueries.all().queryKey
+        : tagQueries.all().queryKey
+
+      queryClient.setQueryData<TaxonomyItem[]>(queryKey, (current = []) =>
+        [...current.filter((entry) => entry.id !== item.id), item]
+          .sort((left, right) => left.name.localeCompare(right.name)),
+      )
+
+      if (kind === 'categories') setCategoryId(item.id)
+      else setTagIds((current) => current.includes(item.id) ? current : [...current, item.id])
+
+      setDirty(true)
+      setTaxonomyCreator(null)
+      setFeedback({
+        type: 'success',
+        message: `${kind === 'categories' ? 'Category' : 'Tag'} created and selected. Save the draft to attach it.`,
+      })
     },
     onError: (error) => {
       if (!handleAuthError(error)) setFeedback({ type: 'error', message: errorMessage(error) })
@@ -275,8 +304,14 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
           </section>
 
           <section>
-            <label>
+            <div className="admin-editor__section-heading">
               <span>Category</span>
+              <button className="admin-editor__inline-create" type="button" onClick={() => { setFeedback(null); createTaxonomyMutation.reset(); setTaxonomyCreator('categories') }}>
+                <Plus aria-hidden="true" /> New
+              </button>
+            </div>
+            <label>
+              <span className="sr-only">Category</span>
               <select value={categoryId} onChange={(event) => { setCategoryId(event.target.value); setDirty(true) }}>
                 <option value="">No category</option>
                 {categoriesQuery.data?.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
@@ -285,7 +320,15 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
           </section>
 
           <section>
-            <div className="admin-editor__section-heading"><span>Tags</span><small>{tagIds.length} selected</small></div>
+            <div className="admin-editor__section-heading">
+              <span>Tags</span>
+              <div className="admin-editor__section-tools">
+                <small>{tagIds.length} selected</small>
+                <button className="admin-editor__inline-create" type="button" onClick={() => { setFeedback(null); createTaxonomyMutation.reset(); setTaxonomyCreator('tags') }}>
+                  <Plus aria-hidden="true" /> New
+                </button>
+              </div>
+            </div>
             <div className="admin-editor__tag-list">
               {tagsQuery.data?.map((tag) => (
                 <label key={tag.id}>
@@ -313,7 +356,73 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
         tags={tagsQuery.data?.filter((tag) => tagIds.includes(tag.id)).map((tag) => tag.name) ?? []}
         document={editor.getJSON() as TiptapNode}
       />
+      {taxonomyCreator && (
+        <InlineTaxonomyDialog
+          kind={taxonomyCreator}
+          error={createTaxonomyMutation.isError ? errorMessage(createTaxonomyMutation.error) : null}
+          saving={createTaxonomyMutation.isPending}
+          onCancel={() => { createTaxonomyMutation.reset(); setTaxonomyCreator(null) }}
+          onCreate={(name) => createTaxonomyMutation.mutate({ kind: taxonomyCreator, name })}
+        />
+      )}
     </main>
+  )
+}
+
+function InlineTaxonomyDialog({
+  kind,
+  error,
+  saving,
+  onCancel,
+  onCreate,
+}: {
+  kind: TaxonomyKind
+  error: string | null
+  saving: boolean
+  onCancel: () => void
+  onCreate: (name: string) => void
+}) {
+  const [name, setName] = useState('')
+  const singular = kind === 'categories' ? 'category' : 'tag'
+
+  return (
+    <Dialog.Root open onOpenChange={(open) => { if (!open && !saving) onCancel() }}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="admin-editor-dialog__overlay" />
+        <Dialog.Content className="admin-editor-taxonomy-dialog">
+          <div>
+            <span className="eyebrow">New {singular}</span>
+            <Dialog.Close disabled={saving} aria-label={`Close ${singular} creator`}>
+              <X aria-hidden="true" />
+            </Dialog.Close>
+          </div>
+          <Dialog.Title>Create {singular}</Dialog.Title>
+          <Dialog.Description>
+            The public slug will be generated automatically. The new {singular} will be selected for this article.
+          </Dialog.Description>
+          {error && <p className="admin-editor-taxonomy-dialog__error" role="alert">{error}</p>}
+          <form onSubmit={(event: FormEvent) => { event.preventDefault(); if (name.trim()) onCreate(name.trim()) }}>
+            <label>
+              <span>Name</span>
+              <input
+                autoFocus
+                maxLength={80}
+                required
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder={`${singular === 'category' ? 'Category' : 'Tag'} name`}
+              />
+            </label>
+            <div>
+              <Dialog.Close disabled={saving}>Cancel</Dialog.Close>
+              <button disabled={saving || !name.trim()} type="submit">
+                {saving ? 'Creating…' : `Create ${singular}`}
+              </button>
+            </div>
+          </form>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 

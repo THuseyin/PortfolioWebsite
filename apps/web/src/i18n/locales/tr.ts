@@ -1,5 +1,5 @@
 export const tr = {
-  language: { label: 'Dil', english: 'İngilizce', turkish: 'Türkçe', german: 'Almanca' },
+  language: { label: 'Dil', english: 'İngilizce', turkish: 'Türkçe', german: 'Almanca', chinese: 'Çince', spanish: 'İspanyolca', hindi: 'Hintçe' },
   navigation: {
     explore: 'Keşfet', title: 'Siteyi keşfet', close: 'Menüyü kapat', home: 'Ana sayfa',
     recent: 'Son yazılar', personal: 'Kişisel not', allArticles: 'Tüm yazılar',

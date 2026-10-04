@@ -42,7 +42,7 @@ export function ArticleDetailPage() {
   }
 
   const article = articleQuery.data
-  const locale = i18n.resolvedLanguage?.startsWith('tr') ? 'tr-TR' : i18n.resolvedLanguage?.startsWith('de') ? 'de-DE' : 'en-GB'
+  const locale = dateLocale(i18n.resolvedLanguage)
   const publishedDate = new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: 'long',
@@ -97,6 +97,15 @@ export function ArticleDetailPage() {
       </footer>
     </article>
   )
+}
+
+function dateLocale(language?: string) {
+  if (language?.startsWith('tr')) return 'tr-TR'
+  if (language?.startsWith('de')) return 'de-DE'
+  if (language?.startsWith('zh')) return 'zh-CN'
+  if (language?.startsWith('es')) return 'es-ES'
+  if (language?.startsWith('hi')) return 'hi-IN'
+  return 'en-GB'
 }
 
 function ArticleDetailLoading() {

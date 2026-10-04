@@ -1,5 +1,5 @@
 export const en = {
-  language: { label: 'Language', english: 'English', turkish: 'Turkish', german: 'German' },
+  language: { label: 'Language', english: 'English', turkish: 'Turkish', german: 'German', chinese: 'Chinese', spanish: 'Spanish', hindi: 'Hindi' },
   navigation: {
     explore: 'Explore', title: 'Explore the website', close: 'Close navigation', home: 'Home',
     recent: 'Recent notes', personal: 'Personal note', allArticles: 'All articles',

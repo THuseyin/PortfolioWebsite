@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowDown, ArrowUpRight, AtSign } from 'lucide-react'
+import { ArrowDown, ArrowUpRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 import { AdminLoginDialog } from '../../components/public/AdminLoginDialog'
 import { HomeNavigation } from '../../components/public/HomeNavigation'
+import { InstagramIcon } from '../../components/public/InstagramIcon'
 import { LanguageSwitcher } from '../../components/public/LanguageSwitcher'
 import { PageMeta } from '../../components/PageMeta'
 import { articleQueries } from '../../features/articles/article-queries'
@@ -135,7 +136,7 @@ export function HomePage() {
               target="_blank"
               rel="noreferrer"
             >
-              <AtSign aria-hidden="true" /> {content.instagramLabel}
+              <InstagramIcon aria-hidden="true" /> {content.instagramLabel}
             </a>
           </div>
         </div>
@@ -352,5 +353,8 @@ function ArticleCard({ article, index }: { article: ArticleSummary; index: numbe
 function dateLocale(language?: string) {
   if (language?.startsWith('tr')) return 'tr-TR'
   if (language?.startsWith('de')) return 'de-DE'
+  if (language?.startsWith('zh')) return 'zh-CN'
+  if (language?.startsWith('es')) return 'es-ES'
+  if (language?.startsWith('hi')) return 'hi-IN'
   return 'en-GB'
 }
