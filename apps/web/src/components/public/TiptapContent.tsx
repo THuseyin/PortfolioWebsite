@@ -22,8 +22,10 @@ function renderNode(node: TiptapNode, key: string): ReactNode {
       const level = clampHeadingLevel(node.attrs?.level)
       return createElement(`h${level}`, { key }, children)
     }
-    case 'bulletList':
-      return <ul key={key}>{children}</ul>
+    case 'bulletList': {
+      const variant = bulletListVariant(node.attrs?.variant)
+      return <ul className={`article-prose__list article-prose__list--${variant}`} data-list-style={variant} key={key}>{children}</ul>
+    }
     case 'orderedList':
       return <ol key={key} start={numberAttribute(node.attrs?.start)}>{children}</ol>
     case 'listItem':
@@ -96,6 +98,10 @@ function stringAttribute(value: unknown) {
 
 function imageAlignment(value: unknown): 'left' | 'center' | 'right' | 'wide' {
   return value === 'left' || value === 'right' || value === 'center' ? value : 'wide'
+}
+
+function bulletListVariant(value: unknown): 'disc' | 'square' | 'dash' {
+  return value === 'square' || value === 'dash' ? value : 'disc'
 }
 
 function plainText(node: TiptapNode): string {

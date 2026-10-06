@@ -40,6 +40,7 @@
 .admin-tiptap__toolbar button.is-active { border-color: var(--signal); color: var(--signal); }
 .admin-tiptap__toolbar button:disabled { cursor: wait; opacity: 0.35; }
 .admin-tiptap__toolbar svg { width: 0.95rem; height: 0.95rem; }
+.admin-tiptap__list-symbol { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1; }
 .admin-tiptap__content { min-height: 34rem; padding: clamp(1.5rem, 4vw, 3.5rem); outline: none; font-size: clamp(1rem, 1.1vw, 1.1rem); line-height: 1.75; }
 .admin-tiptap__content > :first-child { margin-top: 0; }
 .admin-tiptap__content p { margin: 0 0 1.3em; }
@@ -54,7 +55,18 @@
 .admin-tiptap__content h5,
 .admin-tiptap__content h6 { margin: 2rem 0 0.65rem; font-size: clamp(1.2rem, 1.5vw, 1.5rem); letter-spacing: -0.015em; line-height: 1.2; }
 .admin-tiptap__content ul,
-.admin-tiptap__content ol { padding-left: 1.5rem; }
+.admin-tiptap__content ol { margin: 0 0 1.3em; padding-left: 1.65rem; }
+.admin-tiptap__content ul { list-style-type: disc; }
+.admin-tiptap__content ul[data-list-style='square'] { list-style-type: square; }
+.admin-tiptap__content ol { list-style-type: decimal; }
+.admin-tiptap__content li { margin-bottom: 0.45em; padding-left: 0.25em; }
+.admin-tiptap__content li::marker { color: var(--signal); font-family: var(--font-mono); font-weight: 600; }
+.admin-tiptap__content li > p { margin: 0; }
+.admin-tiptap__content li > ul,
+.admin-tiptap__content li > ol { margin: 0.45em 0 0; }
+.admin-tiptap__content ul[data-list-style='dash'] { padding-left: 1.45rem; list-style: none; }
+.admin-tiptap__content ul[data-list-style='dash'] > li { position: relative; }
+.admin-tiptap__content ul[data-list-style='dash'] > li::before { position: absolute; left: -1.25rem; color: var(--signal); content: '—'; font-family: var(--font-mono); font-weight: 600; }
 .admin-tiptap__content blockquote { margin: 2rem 0; padding-left: 1.25rem; border-left: 3px solid var(--signal); font-family: var(--font-display); font-size: 1.35rem; }
 .admin-tiptap__content code { padding: 0.1em 0.3em; background: var(--paper); font-family: var(--font-mono); font-size: 0.86em; }
 .admin-tiptap__content img { display: block; width: 100%; height: auto; margin-block: 2rem; transition: width 220ms ease, margin 220ms ease; }

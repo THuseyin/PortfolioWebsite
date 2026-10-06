@@ -1,4 +1,5 @@
 import Image from '@tiptap/extension-image'
+import { BulletList } from '@tiptap/extension-list'
 import { EditorContent, useEditor, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import * as Dialog from '@radix-ui/react-dialog'
@@ -27,6 +28,21 @@ import './admin-article-editor-page.css'
 import '../public/article-detail-page.css'
 
 const emptyDocument = { type: 'doc', content: [{ type: 'paragraph' }] }
+type BulletListVariant = 'disc' | 'square' | 'dash'
+
+const StyledBulletList = BulletList.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      variant: {
+        default: 'disc',
+        parseHTML: (element) => element.getAttribute('data-list-style') ?? 'disc',
+        renderHTML: (attributes) => ({ 'data-list-style': attributes.variant }),
+      },
+    }
+  },
+})
+
 const AlignedImage = Image.extend({
   addAttributes() {
     return {
@@ -87,7 +103,11 @@ function ExistingArticleEditor({ articleId }: { articleId: string }) {
 
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: [StarterKit.configure({ link: { openOnClick: false } }), AlignedImage.configure({ allowBase64: false })],
+    extensions: [
+      StarterKit.configure({ bulletList: false, link: { openOnClick: false } }),
+      StyledBulletList,
+      AlignedImage.configure({ allowBase64: false }),
+    ],
     content: emptyDocument,
     editorProps: { attributes: { class: 'admin-tiptap__content', 'aria-label': 'Article content' } },
     onUpdate: () => setDirty(true),
@@ -446,6 +466,19 @@ function EditorToolbar({ editor, imageBusy, onImage }: { editor: Editor; imageBu
   const imageSelected = editor.isActive('image')
   const alignImage = (alignment: 'left' | 'center' | 'right' | 'wide') =>
     editor.chain().focus().updateAttributes('image', { alignment }).run()
+  const setBulletList = (variant: BulletListVariant) => {
+    if (editor.isActive('bulletList', { variant })) {
+      editor.chain().focus().toggleBulletList().run()
+      return
+    }
+
+    if (editor.isActive('bulletList')) {
+      editor.chain().focus().updateAttributes('bulletList', { variant }).run()
+      return
+    }
+
+    editor.chain().focus().toggleBulletList().updateAttributes('bulletList', { variant }).run()
+  }
 
   return (
     <div className="admin-tiptap__toolbar" aria-label="Formatting toolbar">
@@ -457,7 +490,9 @@ function EditorToolbar({ editor, imageBusy, onImage }: { editor: Editor; imageBu
       <ToolbarButton active={editor.isActive('bold')} label="Bold" onClick={() => editor.chain().focus().toggleBold().run()}><Bold /></ToolbarButton>
       <ToolbarButton active={editor.isActive('italic')} label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()}><Italic /></ToolbarButton>
       <ToolbarButton active={editor.isActive('code')} label="Inline code" onClick={() => editor.chain().focus().toggleCode().run()}><Code2 /></ToolbarButton>
-      <ToolbarButton active={editor.isActive('bulletList')} label="Bullet list" onClick={() => editor.chain().focus().toggleBulletList().run()}><List /></ToolbarButton>
+      <ToolbarButton active={editor.isActive('bulletList', { variant: 'disc' })} label="Bullet list — dot" onClick={() => setBulletList('disc')}><List /></ToolbarButton>
+      <ToolbarButton active={editor.isActive('bulletList', { variant: 'square' })} label="Bullet list — square" onClick={() => setBulletList('square')}><span className="admin-tiptap__list-symbol" aria-hidden="true">■</span></ToolbarButton>
+      <ToolbarButton active={editor.isActive('bulletList', { variant: 'dash' })} label="Bullet list — dash" onClick={() => setBulletList('dash')}><span className="admin-tiptap__list-symbol" aria-hidden="true">—</span></ToolbarButton>
       <ToolbarButton active={editor.isActive('orderedList')} label="Ordered list" onClick={() => editor.chain().focus().toggleOrderedList().run()}><ListOrdered /></ToolbarButton>
       <ToolbarButton active={editor.isActive('blockquote')} label="Quote" onClick={() => editor.chain().focus().toggleBlockquote().run()}><Quote /></ToolbarButton>
       <ToolbarButton active={editor.isActive('link')} label="Link" onClick={openLinkEditor}><Link2 /></ToolbarButton>
