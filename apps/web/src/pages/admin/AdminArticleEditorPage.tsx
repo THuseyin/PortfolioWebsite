@@ -4,7 +4,7 @@ import { EditorContent, useEditor, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import * as Dialog from '@radix-ui/react-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlignCenter, AlignLeft, AlignRight, ArrowLeft, Bold, Code2, Eye, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Maximize2, Plus, Quote, Redo2, Save, Undo2, Unlink, X } from 'lucide-react'
+import { AlignCenter, AlignLeft, AlignRight, ArrowLeft, Bold, Check, ChevronDown, Code2, Eye, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Maximize2, Plus, Quote, Redo2, Save, Undo2, Unlink, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useBlocker, useNavigate, useParams } from 'react-router'
 
@@ -448,7 +448,27 @@ function InlineTaxonomyDialog({
 
 function EditorToolbar({ editor, imageBusy, onImage }: { editor: Editor; imageBusy: boolean; onImage: () => void }) {
   const [linkOpen, setLinkOpen] = useState(false)
+  const [bulletMenuOpen, setBulletMenuOpen] = useState(false)
   const [href, setHref] = useState('https://')
+  const bulletMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!bulletMenuOpen) return
+
+    const closeMenu = (event: MouseEvent) => {
+      if (!bulletMenuRef.current?.contains(event.target as Node)) setBulletMenuOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setBulletMenuOpen(false)
+    }
+
+    document.addEventListener('pointerdown', closeMenu)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeMenu)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [bulletMenuOpen])
 
   const openLinkEditor = () => {
     setHref((editor.getAttributes('link').href as string | undefined) ?? 'https://')
@@ -479,6 +499,10 @@ function EditorToolbar({ editor, imageBusy, onImage }: { editor: Editor; imageBu
 
     editor.chain().focus().toggleBulletList().updateAttributes('bulletList', { variant }).run()
   }
+  const chooseBulletList = (variant: BulletListVariant) => {
+    if (!editor.isActive('bulletList', { variant })) setBulletList(variant)
+    setBulletMenuOpen(false)
+  }
 
   return (
     <div className="admin-tiptap__toolbar" aria-label="Formatting toolbar">
@@ -490,9 +514,27 @@ function EditorToolbar({ editor, imageBusy, onImage }: { editor: Editor; imageBu
       <ToolbarButton active={editor.isActive('bold')} label="Bold" onClick={() => editor.chain().focus().toggleBold().run()}><Bold /></ToolbarButton>
       <ToolbarButton active={editor.isActive('italic')} label="Italic" onClick={() => editor.chain().focus().toggleItalic().run()}><Italic /></ToolbarButton>
       <ToolbarButton active={editor.isActive('code')} label="Inline code" onClick={() => editor.chain().focus().toggleCode().run()}><Code2 /></ToolbarButton>
-      <ToolbarButton active={editor.isActive('bulletList', { variant: 'disc' })} label="Bullet list — dot" onClick={() => setBulletList('disc')}><List /></ToolbarButton>
-      <ToolbarButton active={editor.isActive('bulletList', { variant: 'square' })} label="Bullet list — square" onClick={() => setBulletList('square')}><span className="admin-tiptap__list-symbol" aria-hidden="true">■</span></ToolbarButton>
-      <ToolbarButton active={editor.isActive('bulletList', { variant: 'dash' })} label="Bullet list — dash" onClick={() => setBulletList('dash')}><span className="admin-tiptap__list-symbol" aria-hidden="true">—</span></ToolbarButton>
+      <div className="admin-tiptap__list-picker" ref={bulletMenuRef}>
+        <ToolbarButton active={editor.isActive('bulletList')} label="Bullet list" onClick={() => setBulletList('disc')}><List /></ToolbarButton>
+        <button
+          aria-expanded={bulletMenuOpen}
+          aria-haspopup="menu"
+          aria-label="Choose bullet list style"
+          className={`admin-tiptap__list-toggle${bulletMenuOpen ? ' is-active' : ''}`}
+          title="Choose bullet list style"
+          type="button"
+          onClick={() => setBulletMenuOpen((open) => !open)}
+        >
+          <ChevronDown aria-hidden="true" />
+        </button>
+        {bulletMenuOpen && (
+          <div className="admin-tiptap__list-menu" role="menu">
+            <BulletStyleOption active={editor.isActive('bulletList', { variant: 'disc' })} label="Round" symbol="●" onClick={() => chooseBulletList('disc')} />
+            <BulletStyleOption active={editor.isActive('bulletList', { variant: 'square' })} label="Square" symbol="■" onClick={() => chooseBulletList('square')} />
+            <BulletStyleOption active={editor.isActive('bulletList', { variant: 'dash' })} label="Dash" symbol="—" onClick={() => chooseBulletList('dash')} />
+          </div>
+        )}
+      </div>
       <ToolbarButton active={editor.isActive('orderedList')} label="Ordered list" onClick={() => editor.chain().focus().toggleOrderedList().run()}><ListOrdered /></ToolbarButton>
       <ToolbarButton active={editor.isActive('blockquote')} label="Quote" onClick={() => editor.chain().focus().toggleBlockquote().run()}><Quote /></ToolbarButton>
       <ToolbarButton active={editor.isActive('link')} label="Link" onClick={openLinkEditor}><Link2 /></ToolbarButton>
@@ -554,6 +596,16 @@ function ArticlePreviewDialog({ open, onOpenChange, title, summary, headerImageU
 
 function ToolbarButton({ active = false, children, disabled = false, label, onClick }: { active?: boolean; children: ReactNode; disabled?: boolean; label: string; onClick: () => void }) {
   return <button className={active ? 'is-active' : undefined} type="button" title={label} aria-label={label} disabled={disabled} onClick={onClick}>{children}</button>
+}
+
+function BulletStyleOption({ active, label, symbol, onClick }: { active: boolean; label: string; symbol: string; onClick: () => void }) {
+  return (
+    <button className={active ? 'is-active' : undefined} role="menuitemradio" aria-checked={active} type="button" onClick={onClick}>
+      <span className="admin-tiptap__list-symbol" aria-hidden="true">{symbol}</span>
+      <span>{label}</span>
+      {active && <Check aria-hidden="true" />}
+    </button>
+  )
 }
 
 function EditorMessage({ title, message }: { title: string; message: string }) {

@@ -41,6 +41,16 @@
 .admin-tiptap__toolbar button:disabled { cursor: wait; opacity: 0.35; }
 .admin-tiptap__toolbar svg { width: 0.95rem; height: 0.95rem; }
 .admin-tiptap__list-symbol { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1; }
+.admin-tiptap__list-picker { position: relative; display: flex; }
+.admin-tiptap__list-picker > button:first-child { border-right: 0; }
+.admin-tiptap__toolbar .admin-tiptap__list-toggle { width: 1.1rem; border-left: 1px solid var(--line); }
+.admin-tiptap__toolbar .admin-tiptap__list-toggle svg { width: 0.65rem; transition: transform 160ms ease; }
+.admin-tiptap__toolbar .admin-tiptap__list-toggle.is-active svg { transform: rotate(180deg); }
+.admin-tiptap__list-menu { position: absolute; z-index: 20; top: calc(100% + 0.45rem); left: 0; display: grid; width: 10rem; padding: 0.35rem; border: 1px solid var(--line-strong); background: var(--paper-raised); box-shadow: 0.35rem 0.35rem 0 color-mix(in srgb, var(--signal) 35%, transparent); gap: 0.15rem; }
+.admin-tiptap__toolbar .admin-tiptap__list-menu button { display: grid; width: 100%; height: 2.35rem; padding: 0 0.55rem; grid-template-columns: 1.25rem 1fr 0.9rem; align-items: center; justify-items: start; color: var(--ink); font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.admin-tiptap__toolbar .admin-tiptap__list-menu button:hover,
+.admin-tiptap__toolbar .admin-tiptap__list-menu button.is-active { border-color: var(--signal); color: var(--signal); background: var(--paper); }
+.admin-tiptap__list-menu button svg { justify-self: end; }
 .admin-tiptap__content { min-height: 34rem; padding: clamp(1.5rem, 4vw, 3.5rem); outline: none; font-size: clamp(1rem, 1.1vw, 1.1rem); line-height: 1.75; }
 .admin-tiptap__content > :first-child { margin-top: 0; }
 .admin-tiptap__content p { margin: 0 0 1.3em; }
@@ -157,6 +167,8 @@
   .admin-editor__sidebar { grid-template-columns: 1fr; }
   .admin-tiptap__toolbar { position: sticky; top: var(--header-height); overflow-x: auto; flex-wrap: nowrap; scrollbar-width: thin; }
   .admin-tiptap__toolbar button { flex: 0 0 2rem; }
+  .admin-tiptap__toolbar .admin-tiptap__list-toggle { flex-basis: 1.1rem; }
+  .admin-tiptap__list-menu { position: fixed; top: calc(var(--header-height) + 3.3rem); left: var(--page-gutter); }
   .admin-tiptap__content { min-height: 26rem; padding: 1.25rem; }
   .admin-editor-preview { inset: 0; border: 0; }
   .admin-editor-preview__bar { min-height: 4rem; }
